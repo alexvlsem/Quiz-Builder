@@ -3,6 +3,8 @@
  */
 public class Answer {
 
-   public Question question;
+   private String text;
+   private Question question;
+   private boolean rightAnswer;
 
 }

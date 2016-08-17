@@ -4,5 +4,6 @@
 public class Question {
 
     private String text;
-
+    private boolean multipleChoice;
+    private Test test;
 }
