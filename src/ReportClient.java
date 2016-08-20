@@ -6,6 +6,10 @@ import javax.swing.*;
  */
 public class ReportClient extends JPanel{
 
+    private ReportGUI reportGUI;
+    private User respondent;
+
+
     class ReportGUI extends JPanel{
 
     }
