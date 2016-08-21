@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import javax.swing.*;
 
 /**
@@ -14,8 +15,8 @@ public class LoginPanelClient extends JFrame {
 
     class LoginPanelGUI extends JPanel{
 
-        private LoginPanel loginPanel;
-        private CreateUserPanel createUserPanel;
+        public LoginPanel loginPanel;
+        public CreateUserPanel createUserPanel;
 
         class LoginPanel extends JPanel{
             JTextField login;
@@ -84,6 +85,10 @@ public class LoginPanelClient extends JFrame {
                     "Create a new user");
 
             add(tabbedPane);
+
+            LoginHandler handler = new LoginHandler(this);
+            createUserPanel.buttonCreateUser.addActionListener(handler);
+            loginPanel.password.addActionListener(handler);
         }
     }
 
@@ -98,16 +103,46 @@ public class LoginPanelClient extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            if (e.getSource() == gui.loginPanel.password){
+            System.out.println(gui.loginPanel);
+
+            /*if (e.getSource() == gui.loginPanel.password){
+
+                String problem = checkLoginPanel();
+                if (problem.length() == 0){
+
+                    String login = gui.loginPanel.login.getText();
+                    String password = new String(gui.loginPanel.password.getPassword());
+
+                    ResultSet result = DataBaseConnector.getUserRecord(new String[] {login,password });
+
+                    //There will be verification
+
+                    User user = new User(login,password,"UserFirstName","UserLastName");
+                }
 
             }
             else if (e.getSource() == gui.createUserPanel.buttonCreateUser){
 
-            }
+                String problem = checkCreateUserPanel();
+                if (problem.length() == 0){
+
+                }
+            }*/
         }
 
+        String checkLoginPanel(){
 
+            String problem = "";
 
+            return problem;
+        }
+
+        String checkCreateUserPanel(){
+
+            String problem = "";
+
+            return problem;
+        }
 
     }
 
