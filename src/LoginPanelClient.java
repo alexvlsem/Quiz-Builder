@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 
 /**
@@ -16,48 +18,55 @@ public class LoginPanelClient extends JFrame {
         private CreateUserPanel createUserPanel;
 
         class LoginPanel extends JPanel{
-            private JTextField email;
-            private JPasswordField password;
+            JTextField login;
+            JPasswordField password;
 
             LoginPanel(){
 
-                setLayout(new GridLayout(2,2));
+                JPanel wrapper = new JPanel();
+                wrapper.setLayout(new GridLayout(2,2));
 
-                email = new JTextField(30);
+                login = new JTextField(10);
                 password = new JPasswordField(10);
 
-                add(new JLabel("Login:"));
-                add(email);
-                add(new Label("Password:"));
-                add(password);
-            }
+                wrapper.add(new JLabel("Login:",JLabel.RIGHT));
+                wrapper.add(login);
+                wrapper.add(new JLabel("Password:",JLabel.RIGHT));
+                wrapper.add(password);
 
+                add(wrapper,BorderLayout.CENTER);
+            }
         }
 
         class CreateUserPanel extends JPanel{
-            private JTextField email;
-            private JTextField password;
-            private JTextField firstName;
-            private JTextField lastName;
+            JTextField login;
+            JTextField password;
+            JTextField firstName;
+            JTextField lastName;
+            JButton buttonCreateUser;
 
             CreateUserPanel(){
 
-                setLayout(new GridLayout(4,2));
+                setLayout(new BorderLayout());
+                JPanel wrapper = new JPanel();
+                wrapper.setLayout(new GridLayout(4,2));
 
-                email = new JTextField(30);
-                password = new JPasswordField(10);
-                firstName = new JTextField(30);
-                lastName = new JTextField(30);
+                login = new JTextField(10);
+                password = new JPasswordField();
+                firstName = new JTextField();
+                lastName = new JTextField();
 
+                wrapper.add(new JLabel("Login (email):",JLabel.RIGHT));
+                wrapper.add(login);
+                wrapper.add(new JLabel("First name:", JLabel.RIGHT));
+                wrapper.add(firstName);
+                wrapper.add(new JLabel("Last name:",JLabel.RIGHT));
+                wrapper.add(lastName);
+                wrapper.add(new JLabel("Password:",JLabel.RIGHT));
+                wrapper.add(password);
 
-                add(new JLabel("email:"));
-                add(email);
-                add(new JLabel("First name:"));
-                add(firstName);
-                add(new JLabel("Last name:"));
-                add(lastName);
-                add(new Label("password:"));
-                add(password);
+                add(wrapper,BorderLayout.NORTH);
+                add(buttonCreateUser = new JButton("Create"),BorderLayout.SOUTH);
             }
         }
 
@@ -74,7 +83,30 @@ public class LoginPanelClient extends JFrame {
             tabbedPane.addTab("Create user",null, createUserPanel,
                     "Create a new user");
 
+            add(tabbedPane);
         }
+    }
+
+    class LoginHandler implements ActionListener{
+
+        LoginPanelGUI gui;
+
+        LoginHandler(LoginPanelGUI gui){
+            this.gui = gui;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            if (e.getSource() == gui.loginPanel.password){
+
+            }
+            else if (e.getSource() == gui.createUserPanel.buttonCreateUser){
+
+            }
+        }
+
+
 
 
     }
@@ -88,13 +120,13 @@ public class LoginPanelClient extends JFrame {
 
         container.add(loginPanelGUI, BorderLayout.CENTER);
 
-        setTitle("Application");
+        setTitle("Quiz Builder");
 
-        setSize(150,150);
+        //setSize(150,150);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //pack();
+        pack();
 
         setLocationRelativeTo(null);
         setVisible(true);
