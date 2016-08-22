@@ -1,5 +1,5 @@
 /**
- * Created by aleksei on 17/08/16.
+ * Created by Aleksei Semenov on 17/08/16.
  */
 public class User {
 
@@ -8,7 +8,7 @@ public class User {
     private String firstName;
     private String lastName;
 
-    public User(String login,String password,String firstName, String lastName){
+    public User(String login, String password, String firstName, String lastName) {
         this.login = login;
         this.password = password;
         this.firstName = firstName;
@@ -16,15 +16,15 @@ public class User {
     }
 
 
-    public String getFirstName(){
+    public String getFirstName() {
         return firstName;
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return login;
     }
 
-    public String getLastName(){
+    public String getLastName() {
         return lastName;
     }
 

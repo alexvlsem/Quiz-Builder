@@ -1,11 +1,11 @@
 import java.sql.*;
 
 /**
- * Created by aleksei on 20/08/16.
+ * Created by Aleksei Semenov on 20/08/16.
  */
 public class DataBaseConnector {
 
-    static ResultSet getUserRecord(String[] array){
+    static ResultSet getUserRecord(String[] array) {
 
 
         String login = array[0];
