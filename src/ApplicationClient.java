@@ -12,7 +12,7 @@ import javax.swing.*;
 public class ApplicationClient extends JFrame {
 
     private User user;
-    ApplicationGUI applicationGUI;
+    private ApplicationGUI applicationGUI;
     private Container container;
 
     public ApplicationClient(User user) {
@@ -25,7 +25,7 @@ public class ApplicationClient extends JFrame {
 
         container.add(applicationGUI, BorderLayout.CENTER);
 
-        setTitle("Quiz Builder");
+        setTitle("Quiz-Builder");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -37,7 +37,7 @@ public class ApplicationClient extends JFrame {
     }
 
     //Consructor for tests
-    ApplicationClient() {
+    private ApplicationClient() {
         this(new User("test", "test", "John", "Smith"));
     }
 
@@ -89,7 +89,7 @@ public class ApplicationClient extends JFrame {
 
     }
 
-    class YourQuizPanel extends JPanel {
+    private class YourQuizPanel extends JPanel {
 
         JScrollPane scrollPane;
         JButton buttonNewQuiz, buttonEditQuiz, buttonDeleteQuiz,
@@ -154,12 +154,10 @@ public class ApplicationClient extends JFrame {
 
     }
 
-    class ResponsesPanel extends JPanel {
-
+    private class ResponsesPanel extends JPanel {
 
         JScrollPane scrollPane;
         JButton buttonCreateReport;
-
 
         ResponsesPanel() {
 
@@ -176,7 +174,6 @@ public class ApplicationClient extends JFrame {
             scrollPane = new JScrollPane(table);
             scrollPane.setPreferredSize(new Dimension(530, 300));
 
-
             JPanel buttonsPanel = new JPanel();
 
             buttonCreateReport = new JButton("Report");
@@ -189,14 +186,13 @@ public class ApplicationClient extends JFrame {
             tablePanel.add(buttonsPanel);
             tablePanel.add(scrollPane);
 
-
             setLayout(new BorderLayout());
             add(new JScrollPane(tablePanel), BorderLayout.CENTER);
 
         }
     }
 
-    class AssignedQuizPanel extends JPanel {
+    private class AssignedQuizPanel extends JPanel {
 
         JScrollPane scrollPane;
         JButton buttonStartQuiz;
@@ -238,7 +234,7 @@ public class ApplicationClient extends JFrame {
         }
     }
 
-    class ApplicationGUI extends JPanel {
+    private class ApplicationGUI extends JPanel {
 
         MainPanel mainPanel;
         YourQuizPanel yourQuizPanel;
@@ -288,7 +284,7 @@ public class ApplicationClient extends JFrame {
         }
     }
 
-    class ApplicationHandler implements ActionListener, ItemListener {
+    private class ApplicationHandler implements ActionListener, ItemListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -299,6 +295,8 @@ public class ApplicationClient extends JFrame {
                 applicationGUI.tabbedPane.setSelectedIndex(3);
             } else if (e.getSource() == applicationGUI.responsesPanel.buttonCreateReport) {
                 new ReportClient();
+            } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonNewQuiz) {
+                new QuizEditingClient(ApplicationClient.this);
             }
         }
 
@@ -306,10 +304,10 @@ public class ApplicationClient extends JFrame {
         public void itemStateChanged(ItemEvent e) {
 
             if (e.getSource() == applicationGUI.profileAction) {
-                if (applicationGUI.profileAction.getSelectedIndex() == 1) {
-
+                if (e.getStateChange() == ItemEvent.SELECTED &&
+                        applicationGUI.profileAction.getSelectedIndex() == 1) {
+                    new LoginClient();
                     dispose();
-                    new LoginPanelClient();
                 }
             }
         }
