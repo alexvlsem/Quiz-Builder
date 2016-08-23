@@ -7,7 +7,10 @@ import java.awt.event.ItemListener;
 import java.util.Vector;
 
 /**
- * Created by aleksei on 17/08/16.
+ * The QuizEditingClient class creates a form for editing a quiz;
+ * is called from an instance of the ApplicationClient class.
+ *
+ * @author Aleksei_Semenov 17/08/16.
  */
 public class QuizEditingClient extends JDialog {
 
@@ -15,21 +18,17 @@ public class QuizEditingClient extends JDialog {
     private Quiz quiz;
     private Container container;
 
-    //QuizEditingClient(User owner, Test test)
     public QuizEditingClient(ApplicationClient applicationClient) {
 
-        super(applicationClient,true);
+        super(applicationClient, true);
 
         quizEditingGUI = new QuizEditingGUI();
 
-
         container = getContentPane();
         container.setLayout(new BorderLayout());
-
         container.add(quizEditingGUI, BorderLayout.CENTER);
 
         setTitle("Quiz-Builder (Quiz Editing)");
-
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         pack();
@@ -37,7 +36,6 @@ public class QuizEditingClient extends JDialog {
         setLocationRelativeTo(null);
         setVisible(true);
         validate();
-
     }
 
     public class QuizEditingGUI extends JPanel {
@@ -48,12 +46,12 @@ public class QuizEditingClient extends JDialog {
                 buttonEditQuestion, buttonDeleteQuestion;
         JScrollPane scrollPane;
 
-        QuizEditingGUI(){
+        QuizEditingGUI() {
 
             quizName = new JTextField(30);
             quizName.setBorder(BorderFactory.createTitledBorder("Name"));
 
-            quizTypes = new JComboBox(new String[]{"test","poll"});
+            quizTypes = new JComboBox(new String[]{"test", "poll"});
             quizTypes.setBorder(BorderFactory.createTitledBorder("Type"));
 
             buttonSaveQuiz = new JButton("Save");
@@ -74,12 +72,12 @@ public class QuizEditingClient extends JDialog {
             header.add(buttonSaveQuiz);
 
             JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new GridLayout(3,1));
+            buttonPanel.setLayout(new GridLayout(3, 1));
             buttonPanel.add(buttonNewQuestion);
             buttonPanel.add(buttonEditQuestion);
             buttonPanel.add(buttonDeleteQuestion);
 
-            Vector headings = new Vector();
+            Vector<String> headings = new Vector<>();
             headings.addElement("N");
             headings.addElement("Question");
             headings.addElement("Multiple Choise");
@@ -94,7 +92,7 @@ public class QuizEditingClient extends JDialog {
             panelTabButt.add(buttonPanel);
 
             JPanel wrapper = new JPanel();
-            wrapper.setLayout(new BoxLayout(wrapper,BoxLayout.Y_AXIS));
+            wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
             wrapper.add(header);
             wrapper.add(panelTabButt);
 
@@ -105,7 +103,7 @@ public class QuizEditingClient extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(e.getSource() == quizEditingGUI.buttonNewQuestion){
+                if (e.getSource() == quizEditingGUI.buttonNewQuestion) {
                     new QuestionEditingClient(QuizEditingClient.this);
                 }
             }
@@ -115,10 +113,9 @@ public class QuizEditingClient extends JDialog {
 
             }
         }
-
     }
 
-    //Only for test
+    //Only to test the form
     public static void main(String[] args) {
         new QuizEditingClient(null);
     }

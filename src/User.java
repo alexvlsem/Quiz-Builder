@@ -1,5 +1,7 @@
 /**
- * Created by Aleksei Semenov on 17/08/16.
+ * The User class represents users and respondents.
+ *
+ * @author Aleksei_Semenov 17/08/16.
  */
 public class User {
 

@@ -1,5 +1,7 @@
 /**
- * @author Created by aleksei on 10/08/16.
+ * The Answer class represents a possible answer on the question.
+ *
+ * @author Aleksei_Semenov 10/08/16.
  */
 public class Answer {
 

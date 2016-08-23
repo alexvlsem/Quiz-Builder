@@ -1,11 +1,13 @@
 import java.sql.*;
 
 /**
- * Created by Aleksei Semenov on 20/08/16.
+ * The DataBaseConnector class gets data from and writes to the database.
+ *
+ * @author Aleksei_Semenov 20/08/16.
  */
 public class DataBaseConnector {
 
-    static ResultSet getUserRecord(String[] array) {
+    public static ResultSet getUserRecord(String[] array) {
 
 
         String login = array[0];

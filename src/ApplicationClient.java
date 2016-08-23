@@ -7,7 +7,10 @@ import java.util.Vector;
 import javax.swing.*;
 
 /**
- * Created by aleksei on 17/08/16.
+ * The ApplicationClient class creates the main form of the program;
+ * can be opened from an instance of the LoginClient class.
+ *
+ * @author Aleksei_Semenov 17/08/16.
  */
 public class ApplicationClient extends JFrame {
 
@@ -27,7 +30,7 @@ public class ApplicationClient extends JFrame {
 
         setTitle("Quiz-Builder");
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         pack();
 
@@ -36,7 +39,7 @@ public class ApplicationClient extends JFrame {
         validate();
     }
 
-    //Consructor for tests
+    //Constructor to test the form
     private ApplicationClient() {
         this(new User("test", "test", "John", "Smith"));
     }
@@ -86,7 +89,6 @@ public class ApplicationClient extends JFrame {
             //setLayout(new FlowLayout());
             add(new JScrollPane(wrapper));
         }
-
     }
 
     private class YourQuizPanel extends JPanel {
@@ -98,9 +100,7 @@ public class ApplicationClient extends JFrame {
 
         YourQuizPanel() {
 
-            //setLayout(new FlowLayout());
-
-            Vector headings = new Vector();
+            Vector<String> headings = new Vector<>();
             headings.addElement("Date");
             headings.addElement("Quiz name");
             headings.addElement("Type");
@@ -135,23 +135,21 @@ public class ApplicationClient extends JFrame {
             listAllUsers.setBorder(BorderFactory.createTitledBorder("All users:"));
             listAssignedToUsers.setBorder(BorderFactory.createTitledBorder("Assigned to:"));
 
-            JPanel buttonsPanel1 = new JPanel();
-            buttonsPanel1.setLayout(new GridLayout(3, 1));
-            buttonsPanel1.add(buttonRefreshAllUsers);
-            buttonsPanel1.add(buttonAddUsers);
-            buttonsPanel1.add(buttonRemoveUsers);
+            JPanel buttonUserPanel = new JPanel();
+            buttonUserPanel.setLayout(new GridLayout(3, 1));
+            buttonUserPanel.add(buttonRefreshAllUsers);
+            buttonUserPanel.add(buttonAddUsers);
+            buttonUserPanel.add(buttonRemoveUsers);
 
             JPanel usersPanel = new JPanel();
             usersPanel.add(new JScrollPane(listAllUsers));
-            usersPanel.add(buttonsPanel1);
+            usersPanel.add(buttonUserPanel);
             usersPanel.add(new JScrollPane(listAssignedToUsers));
 
             setLayout(new BorderLayout());
             add(new JScrollPane(tablePanel), BorderLayout.NORTH);
             add(new JScrollPane(usersPanel), BorderLayout.CENTER);
-
         }
-
     }
 
     private class ResponsesPanel extends JPanel {
@@ -161,9 +159,7 @@ public class ApplicationClient extends JFrame {
 
         ResponsesPanel() {
 
-            //setLayout(new FlowLayout());
-
-            Vector headings = new Vector();
+            Vector<String> headings = new Vector<>();
             headings.addElement("Date");
             headings.addElement("Respondent");
             headings.addElement("Quiz name");
@@ -188,7 +184,6 @@ public class ApplicationClient extends JFrame {
 
             setLayout(new BorderLayout());
             add(new JScrollPane(tablePanel), BorderLayout.CENTER);
-
         }
     }
 
@@ -197,12 +192,9 @@ public class ApplicationClient extends JFrame {
         JScrollPane scrollPane;
         JButton buttonStartQuiz;
 
-
         AssignedQuizPanel() {
 
-            //setLayout(new FlowLayout());
-
-            Vector headings = new Vector();
+            Vector<String> headings = new Vector<>();
             headings.addElement("Date");
             headings.addElement("Quiz name");
             headings.addElement("Author");
@@ -214,23 +206,18 @@ public class ApplicationClient extends JFrame {
             scrollPane = new JScrollPane(table);
             scrollPane.setPreferredSize(new Dimension(530, 300));
 
-
-            JPanel buttonsPanel = new JPanel();
-
             buttonStartQuiz = new JButton("Start");
 
+            JPanel buttonsPanel = new JPanel();
             buttonsPanel.add(buttonStartQuiz);
 
             JPanel tablePanel = new JPanel();
             tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.Y_AXIS));
-
             tablePanel.add(buttonsPanel);
             tablePanel.add(scrollPane);
 
-
             setLayout(new BorderLayout());
             add(new JScrollPane(tablePanel), BorderLayout.CENTER);
-
         }
     }
 
@@ -249,7 +236,6 @@ public class ApplicationClient extends JFrame {
             yourQuizPanel = new YourQuizPanel();
             responsesPanel = new ResponsesPanel();
             assignedQuizPanel = new AssignedQuizPanel();
-
             profileAction = new JComboBox(new String[]{user.getFirstName() + " " + user.getLastName(), "Change user"});
 
             ApplicationHandler handler = new ApplicationHandler();
@@ -266,19 +252,16 @@ public class ApplicationClient extends JFrame {
             responsesPanel.buttonCreateReport.addActionListener(handler);
             assignedQuizPanel.buttonStartQuiz.addActionListener(handler);
 
-            setLayout(new BorderLayout());
-
             tabbedPane = new JTabbedPane();
-
             tabbedPane.addTab("Main", mainPanel);
             tabbedPane.add("Your Quizzes", yourQuizPanel);
             tabbedPane.add("Responses", responsesPanel);
             tabbedPane.add("Assigned Quizzes", assignedQuizPanel);
 
-            //tabbedPane.setSelectedIndex(3);
-
             JPanel actionWrapper = new JPanel();
             actionWrapper.add(profileAction);
+
+            setLayout(new BorderLayout());
             add(actionWrapper, BorderLayout.NORTH);
             add(tabbedPane, BorderLayout.CENTER);
         }
@@ -294,10 +277,10 @@ public class ApplicationClient extends JFrame {
             } else if (e.getSource() == applicationGUI.mainPanel.bottomShowUncompletedQuizes) {
                 applicationGUI.tabbedPane.setSelectedIndex(3);
             } else if (e.getSource() == applicationGUI.responsesPanel.buttonCreateReport) {
-                new ReportClient();
+                new ReportClient(ApplicationClient.this);
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonNewQuiz) {
                 new QuizEditingClient(ApplicationClient.this);
-            }else if(e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz){
+            } else if (e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz) {
                 new QuizTakingClient(ApplicationClient.this);
             }
         }
@@ -315,9 +298,8 @@ public class ApplicationClient extends JFrame {
         }
     }
 
-    //Only for tests
+    //Only to test the form
     public static void main(String[] args) {
-
         new ApplicationClient();
     }
 

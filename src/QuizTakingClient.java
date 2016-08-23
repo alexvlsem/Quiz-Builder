@@ -6,7 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Created by aleksei on 17/08/16.
+ * The QuizTakingClient class creates a form for taking a quiz;
+ * is called from an instance of the ApplicationClient class.
+ *
+ * @author Aleksei_Semenov 17/08/16.
  */
 public class QuizTakingClient extends JDialog {
 
@@ -25,7 +28,7 @@ public class QuizTakingClient extends JDialog {
 
         QuizTakingGUI() {
 
-            questionText = new JTextArea(8,25);
+            questionText = new JTextArea(8, 25);
             questionText.setBorder(BorderFactory.createTitledBorder("Question"));
             answerPanel = buildAnswerPanel();
 
@@ -34,7 +37,7 @@ public class QuizTakingClient extends JDialog {
             buttonFinishQuiz = new JButton("Finish");
 
             JPanel leftPanel = new JPanel();
-            leftPanel.setLayout(new BoxLayout(leftPanel,BoxLayout.Y_AXIS));
+            leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
             leftPanel.add(buttonNextQuestion);
             leftPanel.add(questionText);
             leftPanel.add(buttonSaveAnswer);
@@ -44,10 +47,10 @@ public class QuizTakingClient extends JDialog {
             JScrollPane scrollPaneAllQuestions = new JScrollPane();
             scrollPaneAllQuestions.add(questionList);
             scrollPaneAllQuestions.setBorder(BorderFactory.createTitledBorder("All questions"));
-            scrollPaneAllQuestions.setPreferredSize(new Dimension(150,300));
+            scrollPaneAllQuestions.setPreferredSize(new Dimension(150, 300));
 
             JPanel rightPanel = new JPanel();
-            rightPanel.setLayout(new BoxLayout(rightPanel,BoxLayout.Y_AXIS));
+            rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
             rightPanel.add(scrollPaneAllQuestions);
             rightPanel.add(buttonFinishQuiz);
 
@@ -89,7 +92,6 @@ public class QuizTakingClient extends JDialog {
 
             }
 
-
             return panel;
         }
     }
@@ -109,11 +111,9 @@ public class QuizTakingClient extends JDialog {
 
         container = getContentPane();
         container.setLayout(new BorderLayout());
-
         container.add(quizTakingGUI, BorderLayout.CENTER);
 
         setTitle("Quiz-Builder (Quiz Taking)");
-
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         pack();
@@ -123,7 +123,7 @@ public class QuizTakingClient extends JDialog {
         validate();
     }
 
-    //Only for tests
+    //Only to test the form
     public static void main(String[] args) {
         new QuizTakingClient(null);
     }

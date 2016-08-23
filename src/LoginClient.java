@@ -5,14 +5,17 @@ import java.sql.ResultSet;
 import javax.swing.*;
 
 /**
- * Created by aleksei on 17/08/16.
+ * The LoginClient class is the entrance to the program; creates a form for signing in;
+ * can be opened from an instance the ApplicationClient class when changing the user.
+ *
+ * @author Aleksei_Semenov on 17/08/16.
  */
 public class LoginClient extends JFrame {
 
     private LoginPanelGUI loginPanelGUI;
     private Container container;
 
-    class LoginPanelGUI extends JPanel {
+    private class LoginPanelGUI extends JPanel {
 
         LoginPanel loginPanel;
         CreateUserPanel createUserPanel;
@@ -27,19 +30,16 @@ public class LoginClient extends JFrame {
             loginPanel.buttonSignin.addActionListener(handler);
             createUserPanel.buttonCreateUser.addActionListener(handler);
 
-
             JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-
             tabbedPane.addTab("Log in", loginPanel);
             tabbedPane.addTab("Create user", createUserPanel);
 
             add(tabbedPane);
-
         }
     }
 
 
-    class LoginPanel extends JPanel {
+    private class LoginPanel extends JPanel {
         JTextField login;
         JPasswordField password;
         JButton buttonSignin;
@@ -64,7 +64,7 @@ public class LoginClient extends JFrame {
         }
     }
 
-    class CreateUserPanel extends JPanel {
+    private class CreateUserPanel extends JPanel {
         JTextField login;
         JTextField password;
         JTextField firstName;
@@ -96,8 +96,7 @@ public class LoginClient extends JFrame {
         }
     }
 
-    class LoginHandler implements ActionListener {
-
+    private class LoginHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -106,7 +105,7 @@ public class LoginClient extends JFrame {
                     e.getSource() == loginPanelGUI.loginPanel.buttonSignin) {
 
                 String problem = checkLoginPanel();
-                if (problem.length() == 0) {    
+                if (problem.length() == 0) {
 
                     String login = loginPanelGUI.loginPanel.login.getText();
                     String password = new String(loginPanelGUI.loginPanel.password.getPassword());
@@ -114,7 +113,7 @@ public class LoginClient extends JFrame {
                     ResultSet result = DataBaseConnector.getUserRecord(new String[]{login, password});
 
                     //There will be verification
-                    // Get the first and the last name from result
+                    //Gets the first and the last name from result
 
                     User currentUser = new User(login, password, "John", "Smith");
 
@@ -146,22 +145,16 @@ public class LoginClient extends JFrame {
         }
     }
 
-    LoginClient() {
+    public LoginClient() {
 
         loginPanelGUI = new LoginPanelGUI();
 
         container = getContentPane();
         container.setLayout(new BorderLayout());
-
         container.add(loginPanelGUI, BorderLayout.CENTER);
 
-
         setTitle("Quiz Builder");
-
-        //setSize(150,150);
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
 
         setLocationRelativeTo(null);
@@ -169,8 +162,8 @@ public class LoginClient extends JFrame {
         validate();
     }
 
+    //Start for the program
     public static void main(String[] args) {
         new LoginClient();
     }
-
 }

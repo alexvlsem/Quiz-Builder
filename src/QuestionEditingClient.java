@@ -5,7 +5,10 @@ import java.awt.event.ActionListener;
 import java.util.Vector;
 
 /**
- * @author Aleksei Semenov on 17/08/16.
+ * The QuestionEditingClient class creates the form for editing a question of the quiz;
+ * is called from an instance of the QuizEditingClient class.
+ *
+ * @author Aleksei_Semenov 17/08/16.
  */
 public class QuestionEditingClient extends JDialog {
 
@@ -50,7 +53,7 @@ public class QuestionEditingClient extends JDialog {
             buttonPanel.add(buttonEditAnswer);
             buttonPanel.add(buttonDeleteAnswer);
 
-            Vector headings = new Vector();
+            Vector<String> headings = new Vector<>();
             headings.addElement("#");
             headings.addElement("Answer");
             headings.addElement("Right");
@@ -109,7 +112,7 @@ public class QuestionEditingClient extends JDialog {
         }
     }
 
-    //Only for tests
+    //Only to test the form
     public static void main(String[] args) {
         new QuestionEditingClient(null);
     }
