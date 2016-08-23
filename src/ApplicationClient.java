@@ -297,6 +297,8 @@ public class ApplicationClient extends JFrame {
                 new ReportClient();
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonNewQuiz) {
                 new QuizEditingClient(ApplicationClient.this);
+            }else if(e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz){
+                new QuizTakingClient(ApplicationClient.this);
             }
         }
 

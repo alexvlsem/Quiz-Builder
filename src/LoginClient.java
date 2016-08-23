@@ -16,7 +16,6 @@ public class LoginClient extends JFrame {
 
         LoginPanel loginPanel;
         CreateUserPanel createUserPanel;
-        JButton buttonTest;
 
         LoginPanelGUI() {
 
@@ -25,6 +24,7 @@ public class LoginClient extends JFrame {
 
             LoginHandler handler = new LoginHandler();
             loginPanel.password.addActionListener(handler);
+            loginPanel.buttonSignin.addActionListener(handler);
             createUserPanel.buttonCreateUser.addActionListener(handler);
 
 
@@ -42,21 +42,25 @@ public class LoginClient extends JFrame {
     class LoginPanel extends JPanel {
         JTextField login;
         JPasswordField password;
+        JButton buttonSignin;
 
         LoginPanel() {
 
-            JPanel wrapper = new JPanel();
-            wrapper.setLayout(new GridLayout(2, 2));
-
             login = new JTextField("User login");
             password = new JPasswordField("User Pass");
+            buttonSignin = new JButton("Sign in");
 
+            JPanel wrapper = new JPanel();
+            wrapper.setLayout(new GridLayout(4, 2));
+            wrapper.add(new JLabel("", JLabel.RIGHT));
+            wrapper.add(new JLabel(""));
             wrapper.add(new JLabel("Login:", JLabel.RIGHT));
             wrapper.add(login);
             wrapper.add(new JLabel("Password:", JLabel.RIGHT));
             wrapper.add(password);
-
-            add(wrapper, BorderLayout.CENTER);
+            wrapper.add(new JLabel(""));
+            wrapper.add(buttonSignin);
+            add(wrapper);
         }
     }
 
@@ -98,10 +102,11 @@ public class LoginClient extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            if (e.getSource() == loginPanelGUI.loginPanel.password) {
+            if (e.getSource() == loginPanelGUI.loginPanel.password ||
+                    e.getSource() == loginPanelGUI.loginPanel.buttonSignin) {
 
                 String problem = checkLoginPanel();
-                if (problem.length() == 0) {
+                if (problem.length() == 0) {    
 
                     String login = loginPanelGUI.loginPanel.login.getText();
                     String password = new String(loginPanelGUI.loginPanel.password.getPassword());
