@@ -8,7 +8,7 @@ import java.util.Vector;
 
 /**
  * The QuizEditingClient class creates a form for editing a quiz;
- * is called from an instance of the ApplicationClient class.
+ * its instance is called from an instance of the ApplicationClient class.
  *
  * @author Aleksei_Semenov 17/08/16.
  */
@@ -18,9 +18,11 @@ public class QuizEditingClient extends JDialog {
     private Quiz quiz;
     private Container container;
 
-    public QuizEditingClient(ApplicationClient applicationClient) {
+    public QuizEditingClient(ApplicationClient applicationClient,Quiz quiz) {
 
         super(applicationClient, true);
+
+        this.quiz = quiz;
 
         quizEditingGUI = new QuizEditingGUI();
 
@@ -106,6 +108,9 @@ public class QuizEditingClient extends JDialog {
                 if (e.getSource() == quizEditingGUI.buttonNewQuestion) {
                     new QuestionEditingClient(QuizEditingClient.this);
                 }
+                else if (e.getSource() == quizEditingGUI.buttonSaveQuiz){
+
+                }
             }
 
             @Override
@@ -113,10 +118,5 @@ public class QuizEditingClient extends JDialog {
 
             }
         }
-    }
-
-    //Only to test the form
-    public static void main(String[] args) {
-        new QuizEditingClient(null);
     }
 }

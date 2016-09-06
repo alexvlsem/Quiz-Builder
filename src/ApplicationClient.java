@@ -3,6 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.*;
 
@@ -37,11 +38,6 @@ public class ApplicationClient extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         validate();
-    }
-
-    //Constructor to test the form
-    private ApplicationClient() {
-        this(new User("test", "test", "John", "Smith"));
     }
 
 
@@ -279,7 +275,7 @@ public class ApplicationClient extends JFrame {
             } else if (e.getSource() == applicationGUI.responsesPanel.buttonCreateReport) {
                 new ReportClient(ApplicationClient.this);
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonNewQuiz) {
-                new QuizEditingClient(ApplicationClient.this);
+                new QuizEditingClient(ApplicationClient.this,null);
             } else if (e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz) {
                 new QuizTakingClient(ApplicationClient.this);
             }
@@ -297,10 +293,4 @@ public class ApplicationClient extends JFrame {
             }
         }
     }
-
-    //Only to test the form
-    public static void main(String[] args) {
-        new ApplicationClient();
-    }
-
 }

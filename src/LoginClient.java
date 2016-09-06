@@ -1,12 +1,14 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.ResultSet;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import javax.swing.*;
 
 /**
  * The LoginClient class is the entrance to the program; creates a form for signing in;
- * can be opened from an instance the ApplicationClient class when changing the user.
+ * can be opened from an instance of the ApplicationClient class when changing the user.
  *
  * @author Aleksei_Semenov on 17/08/16.
  */
@@ -14,23 +16,25 @@ public class LoginClient extends JFrame {
 
     private LoginPanelGUI loginPanelGUI;
     private Container container;
+    private JTabbedPane tabbedPane;
 
     private class LoginPanelGUI extends JPanel {
 
         LoginPanel loginPanel;
         CreateUserPanel createUserPanel;
+        LoginHandler handler;
 
         LoginPanelGUI() {
 
             loginPanel = new LoginPanel();
             createUserPanel = new CreateUserPanel();
 
-            LoginHandler handler = new LoginHandler();
+            handler = new LoginHandler();
             loginPanel.password.addActionListener(handler);
             loginPanel.buttonSignin.addActionListener(handler);
             createUserPanel.buttonCreateUser.addActionListener(handler);
 
-            JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+            tabbedPane = new JTabbedPane(JTabbedPane.TOP);
             tabbedPane.addTab("Log in", loginPanel);
             tabbedPane.addTab("Create user", createUserPanel);
 
@@ -46,8 +50,8 @@ public class LoginClient extends JFrame {
 
         LoginPanel() {
 
-            login = new JTextField("User login");
-            password = new JPasswordField("User Pass");
+            login = new JTextField();
+            password = new JPasswordField();
             buttonSignin = new JButton("Sign in");
 
             JPanel wrapper = new JPanel();
@@ -66,7 +70,7 @@ public class LoginClient extends JFrame {
 
     private class CreateUserPanel extends JPanel {
         JTextField login;
-        JTextField password;
+        JPasswordField password;
         JTextField firstName;
         JTextField lastName;
         JButton buttonCreateUser;
@@ -77,12 +81,12 @@ public class LoginClient extends JFrame {
             JPanel wrapper = new JPanel();
             wrapper.setLayout(new GridLayout(4, 2));
 
-            login = new JTextField("User login");
-            password = new JPasswordField("User Pass");
+            login = new JTextField();
+            password = new JPasswordField();
             firstName = new JTextField();
             lastName = new JTextField();
 
-            wrapper.add(new JLabel("Login (email):", JLabel.RIGHT));
+            wrapper.add(new JLabel("Login :", JLabel.RIGHT));
             wrapper.add(login);
             wrapper.add(new JLabel("First name:", JLabel.RIGHT));
             wrapper.add(firstName);
@@ -96,7 +100,7 @@ public class LoginClient extends JFrame {
         }
     }
 
-    private class LoginHandler implements ActionListener {
+    private class LoginHandler extends WindowAdapter implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -110,22 +114,36 @@ public class LoginClient extends JFrame {
                     String login = loginPanelGUI.loginPanel.login.getText();
                     String password = new String(loginPanelGUI.loginPanel.password.getPassword());
 
-                    ResultSet result = DataBaseConnector.getUserRecord(new String[]{login, password});
+                    ArrayList<String> userData = DataBaseConnector.getUserRecord(
+                            new String[]{login, password});
 
-                    //There will be verification
-                    //Gets the first and the last name from result
+                    if (userData.size() == 2) {
+                        User currentUser = new User(login, userData.get(0), userData.get(1));
 
-                    User currentUser = new User(login, password, "John", "Smith");
-
-                    dispose();
-                    new ApplicationClient(currentUser);
+                        dispose();
+                        new ApplicationClient(currentUser);
+                    } else {
+                        JOptionPane.showMessageDialog(loginPanelGUI, userData.get(0));
+                    }
                 }
-
             } else if (e.getSource() == loginPanelGUI.createUserPanel.buttonCreateUser) {
+
+                String login = loginPanelGUI.createUserPanel.login.getText();
+                String firstName = loginPanelGUI.createUserPanel.firstName.getText();
+                String lastName = loginPanelGUI.createUserPanel.lastName.getText();
+                String password = new String(loginPanelGUI.createUserPanel.password.getPassword());
 
                 String problem = checkCreateUserPanel();
                 if (problem.length() == 0) {
-
+                    ArrayList<String> userData = DataBaseConnector.createUser(
+                            new String[]{login, firstName, lastName, password});
+                    if (userData.size() == 1) {
+                        JOptionPane.showMessageDialog(loginPanelGUI, userData.get(0));
+                    } else {
+                        JOptionPane.showMessageDialog(loginPanelGUI, "User has been created!");
+                        loginPanelGUI.loginPanel.login.setText(login);
+                        tabbedPane.setSelectedIndex(0);
+                    }
                 }
             }
         }
@@ -143,6 +161,11 @@ public class LoginClient extends JFrame {
 
             return problem;
         }
+
+        public void windowClosing(WindowEvent e) {
+            DataBaseConnector.closeConnection();
+        }
+
     }
 
     public LoginClient() {
@@ -154,12 +177,15 @@ public class LoginClient extends JFrame {
         container.add(loginPanelGUI, BorderLayout.CENTER);
 
         setTitle("Quiz Builder");
+        addWindowListener(loginPanelGUI.handler);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
 
         setLocationRelativeTo(null);
         setVisible(true);
         validate();
+
+        DataBaseConnector.createConnection();
     }
 
     //Start for the program
