@@ -51,7 +51,7 @@ public class DataBaseConnector {
 
     private static void prepareDatabase() throws SQLException {
 
-        Statement stmt = conn.createStatement();
+        Statement stmt = conn.createStatement(); //
         DatabaseMetaData dbmd = conn.getMetaData();
 
         createUsersTable(dbmd, stmt);
