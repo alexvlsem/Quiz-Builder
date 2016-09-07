@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * The DataBaseConnector class gets data from and writes to the database.
@@ -80,17 +81,16 @@ public class DataBaseConnector {
     private static void createQuizzesTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Quizzes", null);
-        if (!tables.next())
-        {
-            System.out.println("Table Quizzes doesn't exist");
+        if (!tables.next()) {
+            //System.out.println("Table Quizzes doesn't exist");
             String sql = "CREATE TABLE Quizzes " +
                     "(id        INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
-                    " name      VARCHAR(255) NOT NULL ,"+
+                    " name      VARCHAR(255) NOT NULL ," +
                     " ownerId   VARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login))";
 
             stmt.executeUpdate(sql);
-        }else {
-            System.out.println("Table Quizzes exists");
+        } else {
+            //System.out.println("Table Quizzes exists");
         }
     }
 
@@ -124,7 +124,7 @@ public class DataBaseConnector {
             if (rs.next()) {
                 userData.add("The login has already been used,\ntry to enter another one.");
             } else {
-                stmt.executeUpdate("INSERT INTO Users (login, firstName, lastName, password)" +
+                stmt.executeUpdate("INSERT INTO Users (login, firstName, lastName, password) " +
                         "VALUES ( '" + prm[0] + "', '" + prm[1] + "', '" + prm[2] + "', '" + prm[3] + "')");
             }
         } catch (SQLException e) {
@@ -133,81 +133,60 @@ public class DataBaseConnector {
         return userData;
     }
 
+    public static void saveQuiz(Quiz quiz) {
 
-    /*public void create(User user) throws SQLException {
-        try (
-                Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SQL_INSERT,
-                        Statement.RETURN_GENERATED_KEYS);
-        ) {
-            statement.setString(1, user.getName());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getEmail());
-            // ...
+        if (quiz.getId() == 0) {
 
-            int affectedRows = statement.executeUpdate();
+            String query = "INSERT INTO Quizzes (name, ownerId) VALUES (?, ?)";
 
-            if (affectedRows == 0) {
-                throw new SQLException("Creating user failed, no rows affected.");
+            try (PreparedStatement pstm = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                pstm.setString(1, quiz.getName());
+                pstm.setString(2, quiz.getOwner().getLogin());
+                pstm.executeUpdate();
+                ResultSet rs = pstm.getGeneratedKeys();
+                rs.next();
+                quiz.setId(rs.getInt(1));
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
+        } else {
+            String query = "UPDATE Quizzes SET name=? WHERE id=?";
 
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    user.setId(generatedKeys.getLong(1));
-                }
-                else {
-                    throw new SQLException("Creating user failed, no ID obtained.");
-                }
+            try (PreparedStatement pstm = conn.prepareStatement(query)) {
+                pstm.setString(1, quiz.getName());
+                pstm.setInt(2,quiz.getId());
+                pstm.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    try (Connection conn = DriverManager.getConnection(connectionUrl)) {
-            //Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+    public static Vector getQuizzes(User user) {
 
-            DatabaseMetaData dbmd = conn.getMetaData();
+        Vector rows = new Vector();
 
-            ResultSet tables = dbmd.getTables(null, null, "Users", null);
-            if (tables.next()) {
-                // Table exists
-                System.out.println("Table Users exists");
-            } else {
-                // Table does not exist
-                System.out.println("Table Users doesn't exist");
+        String query = "SELECT * FROM Quizzes WHERE ownerId=? ORDER BY id";
 
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            pstm.setString(1,user.getLogin());
+            ResultSet rs = pstm.executeQuery();
 
-                Statement stmt = conn.createStatement();
+            while (rs.next()){
+                Vector row = new Vector();
+                row.add(rs.getInt("id"));
+                row.add(rs.getString("name"));
+                row.add(rs.getString("ownerId"));
 
-                String sql = "CREATE TABLE Users " +
-                        "(id int IDENTITY(1,1) PRIMARY KEY, " +
-                        " email VARCHAR(255), " +
-                        " firstName VARCHAR(255), " +
-                        " lastName VARCHAR(255), " +
-                        " password VARCHAR(8))";
-
-                stmt.executeUpdate(sql);
-                System.out.println("Table Users has been created");
-
-
-                String sqlq = "INSERT INTO Users (email, firstName, lastName, password)" +
-                        "VALUES ( 'a@2.com', 'Zara', 'Ali', 18)";
-                stmt.executeUpdate(sqlq, Statement.RETURN_GENERATED_KEYS);
-
-                ResultSet rs = stmt.getGeneratedKeys();
-                rs.next();
-                System.out.println(rs.getInt(1));
-
+                rows.add(row);
             }
-
-
-            System.out.println("connection ok");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-
-        } finally {
-            System.out.println("connection closed");
         }
 
-    */
+        return rows;
+    }
 
 }

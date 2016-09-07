@@ -1,11 +1,9 @@
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * The ApplicationClient class creates the main form of the program;
@@ -19,6 +17,7 @@ public class ApplicationClient extends JFrame {
     private ApplicationGUI applicationGUI;
     private Container container;
 
+
     public ApplicationClient(User user) {
         this.user = user;
 
@@ -30,7 +29,7 @@ public class ApplicationClient extends JFrame {
         container.add(applicationGUI, BorderLayout.CENTER);
 
         setTitle("Quiz-Builder");
-
+        addWindowListener(applicationGUI.handler);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         pack();
@@ -39,7 +38,6 @@ public class ApplicationClient extends JFrame {
         setVisible(true);
         validate();
     }
-
 
     private class MainPanel extends JPanel {
 
@@ -67,7 +65,7 @@ public class ApplicationClient extends JFrame {
 
             //Puts text area to a scroll pane and add a title to the scroll pane
             JScrollPane scrollUncompletedQuizes = new JScrollPane(textUncompletedQuizes);
-            scrollUncompletedQuizes.setBorder(BorderFactory.createTitledBorder("Uncompleted Quizes"));
+            scrollUncompletedQuizes.setBorder(BorderFactory.createTitledBorder("Uncompleted Quizzes"));
 
             //Puts a scroll pane and a button to a flat panel
             JPanel panelUncompletedQuizes = new JPanel();
@@ -87,12 +85,16 @@ public class ApplicationClient extends JFrame {
         }
     }
 
-    private class YourQuizPanel extends JPanel {
 
+    private class YourQuizPanel extends JPanel {
+        JTable table;
         JScrollPane scrollPane;
         JButton buttonNewQuiz, buttonEditQuiz, buttonDeleteQuiz,
                 buttonAddUsers, buttonRemoveUsers, buttonRefreshAllUsers;
         JList listAllUsers, listAssignedToUsers;
+
+        DefaultTableModel dm;
+
 
         YourQuizPanel() {
 
@@ -102,10 +104,11 @@ public class ApplicationClient extends JFrame {
             headings.addElement("Type");
 
             //Creates new table and adds it to the scroll pane
-            JTable table = new JTable(new Vector(), headings);
+            dm = new DefaultTableModel(DataBaseConnector.getQuizzes(user), headings);
+
+            table = new JTable(dm);
             scrollPane = new JScrollPane(table);
             scrollPane.setPreferredSize(new Dimension(530, 200));
-
 
             JPanel buttonsPanel = new JPanel();
             buttonsPanel.setLayout(new GridLayout(3, 1));
@@ -145,6 +148,21 @@ public class ApplicationClient extends JFrame {
             setLayout(new BorderLayout());
             add(new JScrollPane(tablePanel), BorderLayout.NORTH);
             add(new JScrollPane(usersPanel), BorderLayout.CENTER);
+        }
+
+        void createQuizTable(){
+
+            Vector<String> headings = new Vector<>();
+            headings.addElement("Date");
+            headings.addElement("Quiz name");
+            headings.addElement("Type");
+
+            dm.setDataVector(DataBaseConnector.getQuizzes(user), headings);
+
+            //Creates new table and adds it to the scroll pane
+            //new DefaultTableModel(DataBaseConnector.getQuizzes(user), headings);
+
+            System.out.println("Table refreshed "+table.getRowCount());
         }
     }
 
@@ -225,6 +243,8 @@ public class ApplicationClient extends JFrame {
         AssignedQuizPanel assignedQuizPanel;
         JComboBox profileAction;
         JTabbedPane tabbedPane;
+        ApplicationHandler handler;
+
 
         ApplicationGUI() {
 
@@ -234,7 +254,7 @@ public class ApplicationClient extends JFrame {
             assignedQuizPanel = new AssignedQuizPanel();
             profileAction = new JComboBox(new String[]{user.getFirstName() + " " + user.getLastName(), "Change user"});
 
-            ApplicationHandler handler = new ApplicationHandler();
+            handler = new ApplicationHandler();
 
             profileAction.addItemListener(handler);
             mainPanel.buttonShowNewResponses.addActionListener(handler);
@@ -263,7 +283,7 @@ public class ApplicationClient extends JFrame {
         }
     }
 
-    private class ApplicationHandler implements ActionListener, ItemListener {
+    private class ApplicationHandler extends WindowAdapter implements ActionListener, ItemListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -275,7 +295,22 @@ public class ApplicationClient extends JFrame {
             } else if (e.getSource() == applicationGUI.responsesPanel.buttonCreateReport) {
                 new ReportClient(ApplicationClient.this);
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonNewQuiz) {
-                new QuizEditingClient(ApplicationClient.this,null);
+                new QuizEditingClient(ApplicationClient.this,new Quiz(0,null,user));
+                applicationGUI.yourQuizPanel.createQuizTable();
+            } else if(e.getSource() == applicationGUI.yourQuizPanel.buttonEditQuiz){
+
+                JTable table = applicationGUI.yourQuizPanel.table;
+
+                int rowInd = table.getSelectedRow();
+                if (rowInd < 0){
+                    JOptionPane.showMessageDialog(ApplicationClient.this,"Select the row");
+                }else {
+                    System.out.println(table.getValueAt(rowInd,1));
+                    Quiz currQuiz = new Quiz((Integer) table.getValueAt(rowInd,0),(String) table.getValueAt(rowInd,1),user);
+                    new QuizEditingClient(ApplicationClient.this,currQuiz);
+                    applicationGUI.yourQuizPanel.createQuizTable();
+                }
+
             } else if (e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz) {
                 new QuizTakingClient(ApplicationClient.this);
             }
@@ -291,6 +326,10 @@ public class ApplicationClient extends JFrame {
                     dispose();
                 }
             }
+        }
+
+        public void windowClosing(WindowEvent e) {
+            DataBaseConnector.closeConnection();
         }
     }
 }

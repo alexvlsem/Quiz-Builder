@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -18,7 +19,7 @@ public class QuizEditingClient extends JDialog {
     private Quiz quiz;
     private Container container;
 
-    public QuizEditingClient(ApplicationClient applicationClient,Quiz quiz) {
+    public QuizEditingClient(ApplicationClient applicationClient, Quiz quiz) {
 
         super(applicationClient, true);
 
@@ -51,6 +52,10 @@ public class QuizEditingClient extends JDialog {
         QuizEditingGUI() {
 
             quizName = new JTextField(30);
+            if (quiz.getName() != null){
+                quizName.setText(quiz.getName());
+            }
+
             quizName.setBorder(BorderFactory.createTitledBorder("Name"));
 
             quizTypes = new JComboBox(new String[]{"test", "poll"});
@@ -107,9 +112,10 @@ public class QuizEditingClient extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == quizEditingGUI.buttonNewQuestion) {
                     new QuestionEditingClient(QuizEditingClient.this);
-                }
-                else if (e.getSource() == quizEditingGUI.buttonSaveQuiz){
+                } else if (e.getSource() == quizEditingGUI.buttonSaveQuiz) {
 
+                    quiz.setName(quizEditingGUI.quizName.getText());
+                    DataBaseConnector.saveQuiz(quiz);
                 }
             }
 

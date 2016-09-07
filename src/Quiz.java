@@ -7,4 +7,31 @@ public class Quiz {
 
     private String name;
     private User owner;
+    private int id;
+
+    Quiz(int id,String name,User owner){
+        this.id = id;
+        this.name = name;
+        this.owner =  owner;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
