@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * The AnswerEditingClient class creates the form for editing an answer for the question;
@@ -15,21 +17,22 @@ public class AnswerEditingClient extends JDialog {
 
     private class AnswerEditingGUI extends JPanel {
 
-        JTextField answerName;
         JTextArea answerText;
         JCheckBox rightAnswer;
         JButton buttonSave;
 
         AnswerEditingGUI() {
 
-            answerName = new JTextField(20);
-            answerName.setBorder(BorderFactory.createTitledBorder("Name"));
-            rightAnswer = new JCheckBox("Right answer");
-            buttonSave = new JButton("Save");
             answerText = new JTextArea(8, 35);
+            rightAnswer = new JCheckBox("Right answer");
+
+            if(answer.getId() != 0){
+                answerText.setText(answer.getText());
+                rightAnswer.setSelected(answer.getCorrectness());
+            }
+            buttonSave = new JButton("Save");
 
             JPanel header = new JPanel();
-            header.add(answerName);
             header.add(rightAnswer);
             header.add(buttonSave);
 
@@ -42,10 +45,18 @@ public class AnswerEditingClient extends JDialog {
         }
     }
 
-
-    AnswerEditingClient(QuestionEditingClient dialog) {
+    AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
         super(dialog, true);
+
+        assert (answer != null):
+                "The instance of the Answer class is null in the AnswerEditingClient constructor";
+
+        this.answer = answer;
+
         answerEditingGUI = new AnswerEditingGUI();
+
+        AnswerHandler handler = new AnswerHandler();
+        answerEditingGUI.buttonSave.addActionListener(handler);
 
         container = getContentPane();
         container.setLayout(new BorderLayout());
@@ -61,9 +72,16 @@ public class AnswerEditingClient extends JDialog {
         validate();
     }
 
-    //Only to test the form
-    public static void main(String[] args) {
-        new AnswerEditingClient(null);
-    }
+    private class AnswerHandler implements ActionListener {
 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            if (e.getSource() == answerEditingGUI.buttonSave) {
+                answer.setText(answerEditingGUI.answerText.getText());
+                answer.setCorrectness(answerEditingGUI.rightAnswer.isSelected());
+                DataBaseConnector.saveAnswer(answer);
+            }
+        }
+    }
 }

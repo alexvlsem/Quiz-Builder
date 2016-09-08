@@ -5,14 +5,16 @@
  */
 public class Quiz {
 
-    private String name;
-    private User owner;
     private int id;
+    private String name;
+    private QuizTypes type;
+    private User owner;
 
-    Quiz(int id,String name,User owner){
+    Quiz(int id, String name, QuizTypes type, User owner) {
         this.id = id;
         this.name = name;
-        this.owner =  owner;
+        this.type = type;
+        this.owner = owner;
     }
 
     public String getName() {
@@ -33,5 +35,18 @@ public class Quiz {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public QuizTypes getType() {
+        return type;
+    }
+
+    public void setType(QuizTypes type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -1,10 +1,10 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -22,6 +22,9 @@ public class QuizEditingClient extends JDialog {
     public QuizEditingClient(ApplicationClient applicationClient, Quiz quiz) {
 
         super(applicationClient, true);
+
+        assert (quiz != null):
+                "The instance of the Quiz class is null in the QuizEditingClient constructor";
 
         this.quiz = quiz;
 
@@ -47,19 +50,21 @@ public class QuizEditingClient extends JDialog {
         JComboBox quizTypes;
         JButton buttonSaveQuiz, buttonNewQuestion,
                 buttonEditQuestion, buttonDeleteQuestion;
-        JScrollPane scrollPane;
+        Vector<String> headings = new Vector<>();
+        DefaultTableModel dm;
+        JTable table;
 
         QuizEditingGUI() {
 
             quizName = new JTextField(30);
-            if (quiz.getName() != null){
-                quizName.setText(quiz.getName());
-            }
-
-            quizName.setBorder(BorderFactory.createTitledBorder("Name"));
-
-            quizTypes = new JComboBox(new String[]{"test", "poll"});
+            quizName.setBorder(BorderFactory.createTitledBorder("Quiz Name"));
+            quizTypes = new JComboBox(QuizTypes.values());
             quizTypes.setBorder(BorderFactory.createTitledBorder("Type"));
+
+            if (quiz.getName() != null) {
+                quizName.setText(quiz.getName());
+                quizTypes.setSelectedItem(quiz.getType());
+            }
 
             buttonSaveQuiz = new JButton("Save");
             buttonNewQuestion = new JButton("New");
@@ -84,14 +89,17 @@ public class QuizEditingClient extends JDialog {
             buttonPanel.add(buttonEditQuestion);
             buttonPanel.add(buttonDeleteQuestion);
 
-            Vector<String> headings = new Vector<>();
             headings.addElement("N");
             headings.addElement("Question");
+            headings.addElement("Text");
             headings.addElement("Multiple Choise");
 
             //Creates new table and adds it to the scroll pane
-            JTable table = new JTable(new Vector(), headings);
-            scrollPane = new JScrollPane(table);
+            dm = new DefaultTableModel(DataBaseConnector.getQuestions(quiz), headings);
+            table = new JTable(dm);
+            formatTable();
+
+            JScrollPane scrollPane = new JScrollPane(table);
             scrollPane.setPreferredSize(new Dimension(530, 300));
 
             JPanel panelTabButt = new JPanel();
@@ -106,15 +114,55 @@ public class QuizEditingClient extends JDialog {
             add(wrapper);
         }
 
+        void formatTable(){
+
+            table.getColumn("N").setMaxWidth(50);
+            table.getColumn("Text").setPreferredWidth(200);
+
+            for (int c = 0; c < table.getColumnCount(); c++)
+            {
+                Class<?> col_class = table.getColumnClass(c);
+                table.setDefaultEditor(col_class, null);        // remove editor
+            }
+        }
+
+        void refreshQuestions() {
+
+            int currRow = table.getSelectedRow();
+
+            dm.setDataVector(DataBaseConnector.getQuestions(quiz), headings);
+            formatTable();
+            if (currRow >= 0) {
+                table.setRowSelectionInterval(currRow, currRow);
+            }
+        }
+
         class QuizHandler implements ActionListener, ItemListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == quizEditingGUI.buttonNewQuestion) {
-                    new QuestionEditingClient(QuizEditingClient.this);
-                } else if (e.getSource() == quizEditingGUI.buttonSaveQuiz) {
+                    if (quiz.getId() == 0){
+                        JOptionPane.showMessageDialog(QuizEditingClient.this, "Save the Quiz first");
+                        return;
+                    }
+                    new QuestionEditingClient(QuizEditingClient.this, new Question(0, null, null, true, quiz));
+                    refreshQuestions();
+                } else if (e.getSource() == quizEditingGUI.buttonEditQuestion) {
 
+                    JTable table = quizEditingGUI.table;
+
+                    int rowInd = table.getSelectedRow();
+                    if (rowInd < 0) {
+                        JOptionPane.showMessageDialog(QuizEditingClient.this, "Select the Question");
+                    } else {
+                        new QuestionEditingClient(QuizEditingClient.this, (Question) table.getValueAt(rowInd, 1));
+                        refreshQuestions();
+                    }
+
+                } else if (e.getSource() == quizEditingGUI.buttonSaveQuiz) {
                     quiz.setName(quizEditingGUI.quizName.getText());
+                    quiz.setType((QuizTypes) quizEditingGUI.quizTypes.getSelectedItem());
                     DataBaseConnector.saveQuiz(quiz);
                 }
             }

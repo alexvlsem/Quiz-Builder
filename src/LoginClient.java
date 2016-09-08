@@ -50,7 +50,7 @@ public class LoginClient extends JFrame {
 
         LoginPanel() {
 
-            login = new JTextField();
+            login = new JTextField("a");
             password = new JPasswordField();
             buttonSignin = new JButton("Sign in");
 

@@ -28,5 +28,8 @@ public class User {
         return lastName;
     }
 
-
+    @Override
+    public String toString() {
+        return getFirstName() + " " + getLastName();
+    }
 }
