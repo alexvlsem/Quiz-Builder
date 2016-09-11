@@ -17,6 +17,30 @@ public class QuestionEditingClient extends JDialog {
     private Question question;
     private Container container;
 
+    public QuestionEditingClient(QuizEditingClient dialog, Question question) {
+
+        super(dialog, true);
+
+        this.question = question;
+
+        questionEditingGUI = new QuestionEditingGUI();
+
+        container = getContentPane();
+        container.setLayout(new BorderLayout());
+
+        container.add(questionEditingGUI, BorderLayout.CENTER);
+
+        setTitle("Quiz-Builder (Question Editing)");
+
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        pack();
+
+        setLocationRelativeTo(null);
+        setVisible(true);
+        validate();
+    }
+
     private class QuestionEditingGUI extends JPanel {
 
         JTextField questionName;
@@ -69,7 +93,7 @@ public class QuestionEditingClient extends JDialog {
             headings.addElement("Answer");
             headings.addElement("Right");
 
-            dm = new DefaultTableModel(DataBaseConnector.getAnswers(question),headings);
+            dm = new DefaultTableModel(DataBaseConnector.getAnswers(question), headings);
             table = new JTable(dm);
             formatTable();
 
@@ -89,13 +113,15 @@ public class QuestionEditingClient extends JDialog {
             add(wrapper);
         }
 
-        void formatTable(){
+        void formatTable() {
+
+            assert(table != null): "The variable table in the instance of the inner QuestionEditingGUI class "+
+                    "of the QuestionEditingClient class is null";
 
             table.getColumn("N").setMaxWidth(50);
             table.getColumn("Answer").setPreferredWidth(200);
 
-            for (int c = 0; c < table.getColumnCount(); c++)
-            {
+            for (int c = 0; c < table.getColumnCount(); c++) {
                 Class<?> col_class = table.getColumnClass(c);
                 table.setDefaultEditor(col_class, null);        // remove editor
             }
@@ -113,46 +139,19 @@ public class QuestionEditingClient extends JDialog {
         }
     }
 
-    QuestionEditingClient(QuizEditingClient dialog, Question question) {
-
-        super(dialog, true);
-
-        assert (question != null):
-                "The instance of the Question class is null in the QuestionEditingClient constructor";
-
-        this.question = question;
-
-        questionEditingGUI = new QuestionEditingGUI();
-
-        container = getContentPane();
-        container.setLayout(new BorderLayout());
-
-        container.add(questionEditingGUI, BorderLayout.CENTER);
-
-        setTitle("Quiz-Builder (Question Editing)");
-
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        pack();
-
-        setLocationRelativeTo(null);
-        setVisible(true);
-        validate();
-    }
-
     private class QuestionHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
 
             if (e.getSource() == questionEditingGUI.buttonNewAnswer) {
-                if (question.getId() == 0){
+                if (question.getId() == 0) {
                     JOptionPane.showMessageDialog(QuestionEditingClient.this, "Save the Question first");
                     return;
                 }
                 new AnswerEditingClient(QuestionEditingClient.this, new Answer(0, null, false, question));
                 questionEditingGUI.refreshAnswers();
-            } else if(e.getSource() == questionEditingGUI.buttonEditAnswer){
+            } else if (e.getSource() == questionEditingGUI.buttonEditAnswer) {
 
                 JTable table = questionEditingGUI.table;
 

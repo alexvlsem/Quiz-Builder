@@ -23,9 +23,6 @@ public class QuizEditingClient extends JDialog {
 
         super(applicationClient, true);
 
-        assert (quiz != null):
-                "The instance of the Quiz class is null in the QuizEditingClient constructor";
-
         this.quiz = quiz;
 
         quizEditingGUI = new QuizEditingGUI();
@@ -44,7 +41,7 @@ public class QuizEditingClient extends JDialog {
         validate();
     }
 
-    public class QuizEditingGUI extends JPanel {
+    private class QuizEditingGUI extends JPanel {
 
         JTextField quizName;
         JComboBox quizTypes;
@@ -114,13 +111,15 @@ public class QuizEditingClient extends JDialog {
             add(wrapper);
         }
 
-        void formatTable(){
+        void formatTable() {
+
+            assert (table != null) : "The variable table in the instance of the inner QuizEditingGUI class " +
+                    "of the QuizEditingClient class is null";
 
             table.getColumn("N").setMaxWidth(50);
             table.getColumn("Text").setPreferredWidth(200);
 
-            for (int c = 0; c < table.getColumnCount(); c++)
-            {
+            for (int c = 0; c < table.getColumnCount(); c++) {
                 Class<?> col_class = table.getColumnClass(c);
                 table.setDefaultEditor(col_class, null);        // remove editor
             }
@@ -136,41 +135,41 @@ public class QuizEditingClient extends JDialog {
                 table.setRowSelectionInterval(currRow, currRow);
             }
         }
+    }
 
-        class QuizHandler implements ActionListener, ItemListener {
+    private class QuizHandler implements ActionListener, ItemListener {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == quizEditingGUI.buttonNewQuestion) {
-                    if (quiz.getId() == 0){
-                        JOptionPane.showMessageDialog(QuizEditingClient.this, "Save the Quiz first");
-                        return;
-                    }
-                    new QuestionEditingClient(QuizEditingClient.this, new Question(0, null, null, true, quiz));
-                    refreshQuestions();
-                } else if (e.getSource() == quizEditingGUI.buttonEditQuestion) {
-
-                    JTable table = quizEditingGUI.table;
-
-                    int rowInd = table.getSelectedRow();
-                    if (rowInd < 0) {
-                        JOptionPane.showMessageDialog(QuizEditingClient.this, "Select the Question");
-                    } else {
-                        new QuestionEditingClient(QuizEditingClient.this, (Question) table.getValueAt(rowInd, 1));
-                        refreshQuestions();
-                    }
-
-                } else if (e.getSource() == quizEditingGUI.buttonSaveQuiz) {
-                    quiz.setName(quizEditingGUI.quizName.getText());
-                    quiz.setType((QuizTypes) quizEditingGUI.quizTypes.getSelectedItem());
-                    DataBaseConnector.saveQuiz(quiz);
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == quizEditingGUI.buttonNewQuestion) {
+                if (quiz.getId() == 0) {
+                    JOptionPane.showMessageDialog(QuizEditingClient.this, "Save the Quiz first");
+                    return;
                 }
-            }
+                new QuestionEditingClient(QuizEditingClient.this, new Question(0, null, null, true, quiz));
+                quizEditingGUI.refreshQuestions();
+            } else if (e.getSource() == quizEditingGUI.buttonEditQuestion) {
 
-            @Override
-            public void itemStateChanged(ItemEvent e) {
+                JTable table = quizEditingGUI.table;
 
+                int rowInd = table.getSelectedRow();
+                if (rowInd < 0) {
+                    JOptionPane.showMessageDialog(QuizEditingClient.this, "Select the Question");
+                } else {
+                    new QuestionEditingClient(QuizEditingClient.this, (Question) table.getValueAt(rowInd, 1));
+                    quizEditingGUI.refreshQuestions();
+                }
+
+            } else if (e.getSource() == quizEditingGUI.buttonSaveQuiz) {
+                quiz.setName(quizEditingGUI.quizName.getText());
+                quiz.setType((QuizTypes) quizEditingGUI.quizTypes.getSelectedItem());
+                DataBaseConnector.saveQuiz(quiz);
             }
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+
         }
     }
 }

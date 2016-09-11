@@ -153,6 +153,9 @@ public class ApplicationClient extends JFrame {
 
         void formatTable() {
 
+            assert(table != null):"The variable table in the instance of the inner YourQuizPanel class "+
+                    "of the ApplicationClient class is null";
+
             table.getColumn("N").setMaxWidth(50);
             table.getColumn("Quiz name").setPreferredWidth(200);
 
@@ -396,18 +399,18 @@ public class ApplicationClient extends JFrame {
             } else if (e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz) {
                 new QuizTakingClient(ApplicationClient.this);
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonAddUsers) {
-                ArrayList<User> userlist = new ArrayList<>(
+                ArrayList<User> userList = new ArrayList<>(
                         applicationGUI.yourQuizPanel.listAllUsers.getSelectedValuesList());
-                if (userlist.size() > 0) {
-                    DataBaseConnector.assignQuizToUsers(userlist, applicationGUI.yourQuizPanel.getCurrentQuiz());
+                if (userList.size() > 0) {
+                    DataBaseConnector.assignQuizToUsers(userList, applicationGUI.yourQuizPanel.getCurrentQuiz());
                     applicationGUI.yourQuizPanel.refreshUserLists();
                     applicationGUI.assignedQuizPanel.refreshTable();
                 }
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonRemoveUsers) {
-                ArrayList<User> userlist = new ArrayList<>(
+                ArrayList<User> userList = new ArrayList<>(
                         applicationGUI.yourQuizPanel.listAssignedToUsers.getSelectedValuesList());
-                if (userlist.size() > 0) {
-                    DataBaseConnector.removeQuizFromUsers(userlist, applicationGUI.yourQuizPanel.getCurrentQuiz());
+                if (userList.size() > 0) {
+                    DataBaseConnector.removeQuizFromUsers(userList, applicationGUI.yourQuizPanel.getCurrentQuiz());
                     applicationGUI.yourQuizPanel.refreshUserLists();
                     applicationGUI.assignedQuizPanel.refreshTable();
                 }

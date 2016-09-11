@@ -13,8 +13,7 @@ public class AnswerEditingClient extends JDialog {
 
     private AnswerEditingGUI answerEditingGUI;
     private Answer answer;
-    private Container container;
-
+    
     private class AnswerEditingGUI extends JPanel {
 
         JTextArea answerText;
@@ -45,11 +44,8 @@ public class AnswerEditingClient extends JDialog {
         }
     }
 
-    AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
+    public AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
         super(dialog, true);
-
-        assert (answer != null):
-                "The instance of the Answer class is null in the AnswerEditingClient constructor";
 
         this.answer = answer;
 
@@ -58,7 +54,7 @@ public class AnswerEditingClient extends JDialog {
         AnswerHandler handler = new AnswerHandler();
         answerEditingGUI.buttonSave.addActionListener(handler);
 
-        container = getContentPane();
+        Container container = getContentPane();
         container.setLayout(new BorderLayout());
         container.add(answerEditingGUI, BorderLayout.CENTER);
 
