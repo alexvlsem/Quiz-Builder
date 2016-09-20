@@ -11,30 +11,24 @@ public class DataBaseConnector {
 
     private static Connection conn;
 
-    private static String
-            server = "192.168.100.112\\SQLEXPRESS",
-            database = "QuizBuilder",
-            login = "sa",
-            password = "67351";
-
-    // Create a variable for the connection string.
-    private static String connectionUrl = "jdbc:sqlserver://" + server + ";" +
-            "databaseName=" + database + ";" +
-            "user=" + login + ";" +
-            "password=" + password + ";";
-
     public static void createConnection() {
 
         if (conn == null) {
+            String connectionUrl = "jdbc:sqlserver://" + LoginClient.settings.getServer() + ";" +
+                    "databaseName=" + LoginClient.settings.getDatabase() + ";" +
+                    "user=" + LoginClient.settings.getLogin() + ";" +
+                    "password=" + new String(LoginClient.settings.getPassword()) + ";";
             try {
                 conn = DriverManager.getConnection(connectionUrl);
-                //System.out.println("connection ok");
-
                 prepareDatabase();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static boolean connectionStatus() {
+        return conn == null ? false : true;
     }
 
     public static void closeConnection() {
@@ -67,18 +61,14 @@ public class DataBaseConnector {
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Users", null);
         if (!tables.next()) {
-            //System.out.println("Table Users doesn't exist"); // Table does not exist
 
             String sql = "CREATE TABLE Users " +
-                    "(login     VARCHAR(25)  NOT NULL PRIMARY KEY, " +
-                    " firstName VARCHAR(255) NOT NULL, " +
-                    " lastName  VARCHAR(255) NOT NULL, " +
-                    " password  VARCHAR(8))";
+                    "(login     NVARCHAR(25)  NOT NULL PRIMARY KEY, " +
+                    " firstName NVARCHAR(255) NOT NULL, " +
+                    " lastName  NVARCHAR(255) NOT NULL, " +
+                    " password  NVARCHAR(8))";
 
             stmt.executeUpdate(sql);
-            //System.out.println("Table Users has been created");
-        } else {
-            //System.out.println("Table Users exists"); // Table exists
         }
     }
 
@@ -86,16 +76,13 @@ public class DataBaseConnector {
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Quizzes", null);
         if (!tables.next()) {
-            //System.out.println("Table Quizzes doesn't exist");
             String sql = "CREATE TABLE Quizzes " +
                     "(id        INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
-                    " name      VARCHAR(255) NOT NULL ," +
-                    " type      VARCHAR(25) NOT NULL ," +
-                    " ownerId   VARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login))";
+                    " name      NVARCHAR(255) NOT NULL ," +
+                    " type      NVARCHAR(25) NOT NULL ," +
+                    " ownerId   NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login))";
 
             stmt.executeUpdate(sql);
-        } else {
-            //System.out.println("Table Quizzes exists");
         }
     }
 
@@ -105,8 +92,8 @@ public class DataBaseConnector {
         if (!tables.next()) {
             String sql = "CREATE TABLE Questions " +
                     "(id             INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
-                    " name           VARCHAR(255) NOT NULL ," +
-                    " text           VARCHAR(2000) NOT NULL ," +
+                    " name           NVARCHAR(255) NOT NULL ," +
+                    " text           NVARCHAR(2000) NOT NULL ," +
                     " multipleChoice BIT NOT NULL," +
                     " quizId         INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id))";
 
@@ -120,7 +107,7 @@ public class DataBaseConnector {
         if (!tables.next()) {
             String sql = "CREATE TABLE Answers " +
                     "(id          INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
-                    " text        VARCHAR(2000) NOT NULL ," +
+                    " text        NVARCHAR(2000) NOT NULL ," +
                     " correctness BIT NOT NULL," +
                     " questionId  INTEGER NOT NULL FOREIGN KEY REFERENCES Questions(id))";
 
@@ -133,7 +120,7 @@ public class DataBaseConnector {
         ResultSet tables = dbmd.getTables(null, null, "AssignedQuizzes", null);
         if (!tables.next()) {
             String sql = "CREATE TABLE AssignedQuizzes " +
-                    "(userId        VARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
+                    "(userId        NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
                     " quizId        INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id)," +
                     " assignDate    DATETIME NOT NULL ," +
                     " quizCompleted BIT NOT NULL," +
@@ -149,7 +136,7 @@ public class DataBaseConnector {
         ResultSet tables = dbmd.getTables(null, null, "QuizResponses", null);
         if (!tables.next()) {
             String sql = "CREATE TABLE QuizResponses " +
-                    "(respondentId VARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
+                    "(respondentId NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
                     " quizId       INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id)," +
                     " questionId   INTEGER NOT NULL FOREIGN KEY REFERENCES Questions(id)," +
                     " answerId     INTEGER FOREIGN KEY REFERENCES Answers(id))";

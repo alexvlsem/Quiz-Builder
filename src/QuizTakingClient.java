@@ -62,7 +62,7 @@ public class QuizTakingClient extends JDialog {
 
         JPanel buildAnswerPanel() {
 
-            //There will be a query to the database to get list of answers on the question.
+            //There will be a query to the database to get list of possible answers for the question.
 
             JPanel panel = new JPanel();
             panel.setLayout(new GridBagLayout());
@@ -77,7 +77,7 @@ public class QuizTakingClient extends JDialog {
                 panel.add(checkBox, c);
 
                 JTextField number = new JTextField();
-                number.setText("" + (i + 1));
+                number.setText("" + (i+ 1));
                 c.fill = GridBagConstraints.HORIZONTAL;
                 c.gridx = 1;
                 c.gridy = i;
