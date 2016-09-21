@@ -143,7 +143,7 @@ public class QuizEditingClient extends JDialog {
     }
 
     /**
-     *  The QuizHandler class handles all events of the form.
+     * The QuizHandler class handles all events of the form.
      */
     private class QuizHandler implements ActionListener, ItemListener {
 

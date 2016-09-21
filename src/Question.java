@@ -12,7 +12,7 @@ public class Question {
     private Quiz quiz;
 
     public Question(int id, String name, String text, boolean multipleChoice, Quiz quiz) {
-        this.id   = id;
+        this.id = id;
         this.name = name;
         this.text = text;
         this.multipleChoice = multipleChoice;

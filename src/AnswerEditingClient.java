@@ -15,7 +15,7 @@ public class AnswerEditingClient extends JDialog {
     private ResourceBundle rb = LoginClient.rb;
     private AnswerEditingGUI answerEditingGUI;
     private Answer answer;
-    
+
     private class AnswerEditingGUI extends JPanel {
 
         JTextArea answerText;
@@ -27,7 +27,7 @@ public class AnswerEditingClient extends JDialog {
             answerText = new JTextArea(8, 35);
             rightAnswer = new JCheckBox(rb.getString("lbRightAnswer"));
 
-            if(answer.getId() != 0){
+            if (answer.getId() != 0) {
                 answerText.setText(answer.getText());
                 rightAnswer.setSelected(answer.getCorrectness());
             }
@@ -60,7 +60,7 @@ public class AnswerEditingClient extends JDialog {
         container.setLayout(new BorderLayout());
         container.add(answerEditingGUI, BorderLayout.CENTER);
 
-        setTitle("Quiz-Builder ("+rb.getString("tlAnswerEditing")+")");
+        setTitle("Quiz-Builder (" + rb.getString("tlAnswerEditing") + ")");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         pack();

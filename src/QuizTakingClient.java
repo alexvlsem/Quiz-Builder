@@ -77,7 +77,7 @@ public class QuizTakingClient extends JDialog {
                 panel.add(checkBox, c);
 
                 JTextField number = new JTextField();
-                number.setText("" + (i+ 1));
+                number.setText("" + (i + 1));
                 c.fill = GridBagConstraints.HORIZONTAL;
                 c.gridx = 1;
                 c.gridy = i;

@@ -3,7 +3,7 @@ import java.io.Serializable;
 /**
  * @author Aleksei_Semenov 2016-09-18.
  */
-public class Settings implements Serializable{
+public class Settings implements Serializable {
 
     private String
             server,

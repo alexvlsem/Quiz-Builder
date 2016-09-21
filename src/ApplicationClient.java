@@ -139,8 +139,8 @@ public class ApplicationClient extends JFrame {
             JScrollPane spAssignUsers = new JScrollPane(listAssignedToUsers);
             spAllUsers.setBorder(BorderFactory.createTitledBorder(rb.getString("tlAllUsers")));
             spAssignUsers.setBorder(BorderFactory.createTitledBorder(rb.getString("tlAssignedTo")));
-            spAllUsers.setPreferredSize(new Dimension(250,120));
-            spAssignUsers.setPreferredSize(new Dimension(250,120));
+            spAllUsers.setPreferredSize(new Dimension(250, 120));
+            spAssignUsers.setPreferredSize(new Dimension(250, 120));
 
             buttonAddUsers = new JButton(">");
             buttonRemoveUsers = new JButton("<");
@@ -162,7 +162,7 @@ public class ApplicationClient extends JFrame {
 
         void formatTable() {
 
-            assert(table != null):"The variable table in the instance of the inner YourQuizPanel class "+
+            assert (table != null) : "The variable table in the instance of the inner YourQuizPanel class " +
                     "of the ApplicationClient class is null";
 
             table.getColumn(rb.getString("tlNumber")).setMaxWidth(50);
@@ -308,25 +308,25 @@ public class ApplicationClient extends JFrame {
             dm.setDataVector(DataBaseConnector.getAssignedQuizzes(user), headings);
 
             formatTable();
-           refreshInfo();
+            refreshInfo();
             if (currRow >= 0) {
                 table.setRowSelectionInterval(currRow, currRow);
             }
         }
 
-        void refreshInfo(){
+        void refreshInfo() {
             int newQuizzes = 0;
 
-            for (int i = 0; i< table.getRowCount(); i++){
-                if (!(boolean) table.getValueAt(i,5)){
+            for (int i = 0; i < table.getRowCount(); i++) {
+                if (!(boolean) table.getValueAt(i, 5)) {
                     newQuizzes++;
                 }
             }
 
             String info = rb.getString("msInfo1");
-            if (newQuizzes > 0){
-                info = rb.getString("msInfo2")+newQuizzes+rb.getString("msInfo3")
-                        +(newQuizzes>1?rb.getString("msInfo4"):"");
+            if (newQuizzes > 0) {
+                info = rb.getString("msInfo2") + newQuizzes + rb.getString("msInfo3")
+                        + (newQuizzes > 1 ? rb.getString("msInfo4") : "");
             }
             applicationGUI.mainPanel.textUncompletedQuizes.setText(info);
 
@@ -454,12 +454,12 @@ public class ApplicationClient extends JFrame {
         }
     }
 
-    public static boolean fieldIsCorrect(String s, int maxLength, String fieldName){
+    public static boolean fieldIsCorrect(String s, int maxLength, String fieldName) {
 
         s = s.trim();
-        if (s.length() > 0 && s.length() <= maxLength){
+        if (s.length() > 0 && s.length() <= maxLength) {
             return true;
-        }else {
+        } else {
             JOptionPane.showMessageDialog(null, fieldName + rb.getString("msCheckValue4")
                             + maxLength + rb.getString("msCheckValue2"), rb.getString("msCheckValue3"),
                     JOptionPane.ERROR_MESSAGE);
