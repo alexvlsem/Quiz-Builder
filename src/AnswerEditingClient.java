@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 /**
  * The AnswerEditingClient class creates the form for editing an answer for the question;
@@ -11,6 +12,7 @@ import java.awt.event.ActionListener;
  */
 public class AnswerEditingClient extends JDialog {
 
+    private ResourceBundle rb = LoginClient.rb;
     private AnswerEditingGUI answerEditingGUI;
     private Answer answer;
     
@@ -23,13 +25,13 @@ public class AnswerEditingClient extends JDialog {
         AnswerEditingGUI() {
 
             answerText = new JTextArea(8, 35);
-            rightAnswer = new JCheckBox("Right answer");
+            rightAnswer = new JCheckBox(rb.getString("lbRightAnswer"));
 
             if(answer.getId() != 0){
                 answerText.setText(answer.getText());
                 rightAnswer.setSelected(answer.getCorrectness());
             }
-            buttonSave = new JButton("Save");
+            buttonSave = new JButton(rb.getString("btSave"));
 
             JPanel header = new JPanel();
             header.add(rightAnswer);
@@ -58,7 +60,7 @@ public class AnswerEditingClient extends JDialog {
         container.setLayout(new BorderLayout());
         container.add(answerEditingGUI, BorderLayout.CENTER);
 
-        setTitle("Quiz-Builder (Answer Editing)");
+        setTitle("Quiz-Builder ("+rb.getString("tlAnswerEditing")+")");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         pack();

@@ -64,8 +64,8 @@ public class DataBaseConnector {
 
             String sql = "CREATE TABLE Users " +
                     "(login     NVARCHAR(25)  NOT NULL PRIMARY KEY, " +
-                    " firstName NVARCHAR(255) NOT NULL, " +
-                    " lastName  NVARCHAR(255) NOT NULL, " +
+                    " firstName NVARCHAR(50) NOT NULL, " +
+                    " lastName  NVARCHAR(50) NOT NULL, " +
                     " password  NVARCHAR(8))";
 
             stmt.executeUpdate(sql);
@@ -467,5 +467,4 @@ public class DataBaseConnector {
         }
         return rows;
     }
-
 }

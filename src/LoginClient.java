@@ -10,11 +10,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.*;
 
 /**
- * The LoginClient class is the entrance to the program; creates a form for signing in;
- * can be opened from an instance of the ApplicationClient class when changing the user.
+ * The LoginClient class is the entrance to the program; creates a form for signing in,
+ * creating a user and saving settings. Its instance can be called from an instance of
+ * the ApplicationClient class during changing the user.
  *
  * @author Aleksei_Semenov on 17/08/16.
  */
@@ -27,6 +30,9 @@ public class LoginClient extends JFrame {
     private Container container;
     private JTabbedPane tabbedPane;
 
+    /**
+     * The LoginPanelGUI class creates interface of the login panel.
+     */
     private class LoginPanelGUI extends JPanel {
 
         LoginPanel loginPanel;
@@ -56,7 +62,9 @@ public class LoginClient extends JFrame {
         }
     }
 
-
+    /**
+     * The inner LoginPanel class creates a login panel.
+     */
     private class LoginPanel extends JPanel {
         JTextField login;
         JPasswordField password;
@@ -105,6 +113,9 @@ public class LoginClient extends JFrame {
         }
     }
 
+    /**
+     * The inner CreateUserPanel class creates a panel for creating a user.
+     */
     private class CreateUserPanel extends JPanel {
         JTextField login, firstName, lastName;
         JPasswordField password;
@@ -157,10 +168,12 @@ public class LoginClient extends JFrame {
             c.gridx = 1;
             c.gridy = 4;
             add(buttonCreateUser, c);
-
         }
     }
 
+    /**
+     * The inner SettingsPanel class creates a panel for storing settings.
+     */
     private class SettingsPanel extends JPanel {
 
         JTextField server, database, login;
@@ -190,7 +203,6 @@ public class LoginClient extends JFrame {
             JPanel connectionPanel = new JPanel();
             connectionPanel.setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
-
 
             c.fill = GridBagConstraints.HORIZONTAL;
             c.gridx = 0;
@@ -236,7 +248,8 @@ public class LoginClient extends JFrame {
             c.gridy = 4;
             connectionPanel.add(buttonTestConnection, c);
 
-            connectionPanel.setBorder(BorderFactory.createTitledBorder(rb.getString("tlConnection")));
+            connectionPanel.setBorder(BorderFactory.createTitledBorder(
+                    rb.getString("tlConnection")));
 
             JPanel languagePanel = new JPanel();
             languagePanel.add(new JLabel(rb.getString("lbLanguage")));
@@ -246,10 +259,12 @@ public class LoginClient extends JFrame {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             add(connectionPanel);
             add(languagePanel);
-
         }
     }
 
+    /**
+     * The inner LoginHandler class handles all actions of the LoginPanelGUI and LoginClient instances.
+     */
     private class LoginHandler extends WindowAdapter implements ActionListener {
 
         @Override
@@ -258,11 +273,11 @@ public class LoginClient extends JFrame {
             if (e.getSource() == loginPanelGUI.loginPanel.password ||
                     e.getSource() == loginPanelGUI.loginPanel.buttonSignIn) {
 
-                String problem = checkLoginPanel();
-                if (problem.length() == 0) {
+                String login = loginPanelGUI.loginPanel.login.getText();
+                String password = new String(loginPanelGUI.loginPanel.password.getPassword());
 
-                    String login = loginPanelGUI.loginPanel.login.getText();
-                    String password = new String(loginPanelGUI.loginPanel.password.getPassword());
+                if (checkValue(login, 25, rb.getString("lbLogin")) &&
+                        checkValue(password, 8, rb.getString("lbPassword"))) {
 
                     DataBaseConnector.createConnection();
 
@@ -285,8 +300,10 @@ public class LoginClient extends JFrame {
                 String lastName = loginPanelGUI.createUserPanel.lastName.getText();
                 String password = new String(loginPanelGUI.createUserPanel.password.getPassword());
 
-                String problem = checkCreateUserPanel();
-                if (problem.length() == 0) {
+                if (checkValue(login, 25, rb.getString("lbLogin")) &&
+                        checkValue(firstName, 50, rb.getString("lbFirstName")) &&
+                        checkValue(lastName, 50, rb.getString("lbLastName")) &&
+                        checkValue(password, 8, rb.getString("lbPassword"))) {
 
                     DataBaseConnector.createConnection();
                     ArrayList<String> userData = DataBaseConnector.createUser(
@@ -309,8 +326,8 @@ public class LoginClient extends JFrame {
                 settings.setDatabase(loginPanelGUI.settingsPanel.database.getText());
                 settings.setLogin(loginPanelGUI.settingsPanel.login.getText());
                 settings.setPassword(loginPanelGUI.settingsPanel.password.getPassword());
-                settings.setLocalization((InterfaceLanguages) loginPanelGUI.settingsPanel.boxLanguage.getSelectedItem());
-
+                settings.setLocalization((
+                        InterfaceLanguages) loginPanelGUI.settingsPanel.boxLanguage.getSelectedItem());
                 try {
                     ObjectOutputStream os = new ObjectOutputStream(
                             new FileOutputStream("settings.txt"));
@@ -322,7 +339,6 @@ public class LoginClient extends JFrame {
                 if (settings == null) {
                     settings = new Settings();
                 }
-
                 settings.setServer(loginPanelGUI.settingsPanel.server.getText());
                 settings.setDatabase(loginPanelGUI.settingsPanel.database.getText());
                 settings.setLogin(loginPanelGUI.settingsPanel.login.getText());
@@ -342,26 +358,14 @@ public class LoginClient extends JFrame {
             }
         }
 
-        String checkLoginPanel() {
-
-            String problem = "";
-
-            return problem;
-        }
-
-        String checkCreateUserPanel() {
-
-            String problem = "";
-
-            return problem;
-        }
-
         public void windowClosing(WindowEvent e) {
             DataBaseConnector.closeConnection();
         }
-
     }
 
+    /**
+     * The LoginClient class constructor.
+     */
     public LoginClient() {
 
         loginPanelGUI = new LoginPanelGUI();
@@ -381,6 +385,32 @@ public class LoginClient extends JFrame {
 
     }
 
+    /**
+     * The checkValue method checks values of the forms.
+     *
+     * @param s         The entered value
+     * @param maxLength The max length of the value
+     * @param fieldName The name of the entered value
+     * @return boolean
+     */
+    public static boolean checkValue(String s, int maxLength, String fieldName) {
+
+        Pattern pattern = Pattern.compile("[a-zA-Zа-яА-Я\\d_]{1," + maxLength + "}");
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find() && matcher.group().equals(s)) {
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, fieldName + rb.getString("msCheckValue1")
+                            + maxLength + rb.getString("msCheckValue2"), rb.getString("msCheckValue3"),
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
+    }
+
+    /**
+     * The loadSettings method loads settings from the file,
+     * instantiates the settings and rb variables.
+     */
     private static void loadSettings() {
         Path fileSettings = Paths.get("settings.txt");
         if (Files.exists(fileSettings)) {
@@ -399,21 +429,18 @@ public class LoginClient extends JFrame {
         rb = ResourceBundle.getBundle("Localization.Labels", locale);
     }
 
-    //The start of the program
+    /**
+     * The entrance of the program.
+     */
     public static void main(String[] args) {
 
         try {
             // Set cross-platform Java L&F (also called "Metal")
             UIManager.setLookAndFeel(
                     UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (UnsupportedLookAndFeelException e) {
-            // handle exception
-        } catch (ClassNotFoundException e) {
-            // handle exception
-        } catch (InstantiationException e) {
-            // handle exception
-        } catch (IllegalAccessException e) {
-            // handle exception
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException |
+                InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         loadSettings();

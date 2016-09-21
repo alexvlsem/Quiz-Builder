@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 /**
@@ -15,6 +16,7 @@ import java.util.Vector;
  */
 public class QuizEditingClient extends JDialog {
 
+    private ResourceBundle rb = LoginClient.rb;
     private QuizEditingGUI quizEditingGUI;
     private Quiz quiz;
     private Container container;
@@ -31,7 +33,7 @@ public class QuizEditingClient extends JDialog {
         container.setLayout(new BorderLayout());
         container.add(quizEditingGUI, BorderLayout.CENTER);
 
-        setTitle("Quiz-Builder (Quiz Editing)");
+        setTitle("Quiz-Builder (" + rb.getString("tlQuizEditing") + ")");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         pack();
@@ -41,6 +43,9 @@ public class QuizEditingClient extends JDialog {
         validate();
     }
 
+    /**
+     * The QuizEditingGUI class creates interface for editing a quiz.
+     */
     private class QuizEditingGUI extends JPanel {
 
         JTextField quizName;
@@ -54,19 +59,19 @@ public class QuizEditingClient extends JDialog {
         QuizEditingGUI() {
 
             quizName = new JTextField(30);
-            quizName.setBorder(BorderFactory.createTitledBorder("Quiz Name"));
+            quizName.setBorder(BorderFactory.createTitledBorder(rb.getString("tlQuizName")));
             quizTypes = new JComboBox(QuizTypes.values());
-            quizTypes.setBorder(BorderFactory.createTitledBorder("Type"));
+            quizTypes.setBorder(BorderFactory.createTitledBorder(rb.getString("tlType")));
 
             if (quiz.getName() != null) {
                 quizName.setText(quiz.getName());
                 quizTypes.setSelectedItem(quiz.getType());
             }
 
-            buttonSaveQuiz = new JButton("Save");
-            buttonNewQuestion = new JButton("New");
-            buttonEditQuestion = new JButton("Edit");
-            buttonDeleteQuestion = new JButton("Delete");
+            buttonSaveQuiz = new JButton(rb.getString("btSave"));
+            buttonNewQuestion = new JButton(rb.getString("btNew"));
+            buttonEditQuestion = new JButton(rb.getString("btEdit"));
+            buttonDeleteQuestion = new JButton(rb.getString("btDelete"));
 
             QuizHandler handler = new QuizHandler();
             quizTypes.addItemListener(handler);
@@ -86,10 +91,10 @@ public class QuizEditingClient extends JDialog {
             buttonPanel.add(buttonEditQuestion);
             buttonPanel.add(buttonDeleteQuestion);
 
-            headings.addElement("N");
-            headings.addElement("Question");
-            headings.addElement("Text");
-            headings.addElement("Multiple Choise");
+            headings.addElement(rb.getString("tlNumber"));
+            headings.addElement(rb.getString("tlQuestion"));
+            headings.addElement(rb.getString("tlText"));
+            headings.addElement(rb.getString("tlMultipleChoice"));
 
             //Creates new table and adds it to the scroll pane
             dm = new DefaultTableModel(DataBaseConnector.getQuestions(quiz), headings);
@@ -116,8 +121,8 @@ public class QuizEditingClient extends JDialog {
             assert (table != null) : "The variable table in the instance of the inner QuizEditingGUI class " +
                     "of the QuizEditingClient class is null";
 
-            table.getColumn("N").setMaxWidth(50);
-            table.getColumn("Text").setPreferredWidth(200);
+            table.getColumn(rb.getString("tlNumber")).setMaxWidth(50);
+            table.getColumn(rb.getString("tlText")).setPreferredWidth(200);
 
             for (int c = 0; c < table.getColumnCount(); c++) {
                 Class<?> col_class = table.getColumnClass(c);
@@ -137,13 +142,16 @@ public class QuizEditingClient extends JDialog {
         }
     }
 
+    /**
+     *  The QuizHandler class handles all events of the form.
+     */
     private class QuizHandler implements ActionListener, ItemListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == quizEditingGUI.buttonNewQuestion) {
                 if (quiz.getId() == 0) {
-                    JOptionPane.showMessageDialog(QuizEditingClient.this, "Save the Quiz first");
+                    JOptionPane.showMessageDialog(QuizEditingClient.this, rb.getString("msSaveTheQuiz"));
                     return;
                 }
                 new QuestionEditingClient(QuizEditingClient.this, new Question(0, null, null, true, quiz));
@@ -154,16 +162,20 @@ public class QuizEditingClient extends JDialog {
 
                 int rowInd = table.getSelectedRow();
                 if (rowInd < 0) {
-                    JOptionPane.showMessageDialog(QuizEditingClient.this, "Select the Question");
+                    JOptionPane.showMessageDialog(QuizEditingClient.this, rb.getString("msSelectTheQuestion"));
                 } else {
                     new QuestionEditingClient(QuizEditingClient.this, (Question) table.getValueAt(rowInd, 1));
                     quizEditingGUI.refreshQuestions();
                 }
 
             } else if (e.getSource() == quizEditingGUI.buttonSaveQuiz) {
-                quiz.setName(quizEditingGUI.quizName.getText());
-                quiz.setType((QuizTypes) quizEditingGUI.quizTypes.getSelectedItem());
-                DataBaseConnector.saveQuiz(quiz);
+
+                String quizName = quizEditingGUI.quizName.getText();
+                if (ApplicationClient.fieldIsCorrect(quizName, 255, rb.getString("tlQuizName"))) {
+                    quiz.setName(quizName);
+                    quiz.setType((QuizTypes) quizEditingGUI.quizTypes.getSelectedItem());
+                    DataBaseConnector.saveQuiz(quiz);
+                }
             }
         }
 

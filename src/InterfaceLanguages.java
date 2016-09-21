@@ -5,6 +5,7 @@ import java.io.Serializable;
  */
 public enum InterfaceLanguages implements Serializable {
     ENGLISH("English", "", ""),
+    FRENCH("Français","fr","CA"),
     RUSSIAN("Русский", "ru", "RU");
 
     String name, language, country;

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -9,11 +10,13 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * The ApplicationClient class creates the main form of the program;
- * is opened from an instance of the LoginClient class.
+ * it is opened from an instance of the LoginClient class.
  *
  * @author Aleksei_Semenov 17/08/16.
  */
 public class ApplicationClient extends JFrame {
+
+    private static ResourceBundle rb = LoginClient.rb;
 
     private User user;
     private ApplicationGUI applicationGUI;
@@ -40,6 +43,9 @@ public class ApplicationClient extends JFrame {
         validate();
     }
 
+    /**
+     * The inner MainPanel creates the main panel containing general information.
+     */
     private class MainPanel extends JPanel {
 
         JTextArea textNewResponses, textUncompletedQuizes;
@@ -49,15 +55,16 @@ public class ApplicationClient extends JFrame {
 
             textNewResponses = new JTextArea(4, 20);
             textNewResponses.setEditable(false);
-            buttonShowNewResponses = new JButton("Show");
+            buttonShowNewResponses = new JButton(rb.getString("btShow"));
 
             textUncompletedQuizes = new JTextArea(4, 20);
             textUncompletedQuizes.setEditable(false);
-            bottomShowUncompletedQuizes = new JButton("Show");
+            bottomShowUncompletedQuizes = new JButton(rb.getString("btShow"));
 
             //Puts text area to a scroll pane and add a title to the scroll pane
             JScrollPane scrollPaneNewResponses = new JScrollPane(textNewResponses);
-            scrollPaneNewResponses.setBorder(BorderFactory.createTitledBorder("New Responses"));
+            scrollPaneNewResponses.setBorder(BorderFactory.
+                    createTitledBorder(rb.getString("tlNewResponses")));
 
             //Puts a scroll pane and a button to a flat panel
             JPanel panelNewResponses = new JPanel();
@@ -66,7 +73,8 @@ public class ApplicationClient extends JFrame {
 
             //Puts text area to a scroll pane and add a title to the scroll pane
             JScrollPane scrollUncompletedQuizes = new JScrollPane(textUncompletedQuizes);
-            scrollUncompletedQuizes.setBorder(BorderFactory.createTitledBorder("Uncompleted Quizzes"));
+            scrollUncompletedQuizes.setBorder(BorderFactory.
+                    createTitledBorder(rb.getString("tlUncompletedQuizzes")));
 
             //Puts a scroll pane and a button to a flat panel
             JPanel panelUncompletedQuizes = new JPanel();
@@ -74,8 +82,9 @@ public class ApplicationClient extends JFrame {
             panelUncompletedQuizes.add(bottomShowUncompletedQuizes);
 
             JPanel wrapper = new JPanel();
-            wrapper.setLayout(new GridLayout(2, 1));
+            wrapper.setLayout(new GridLayout(3, 1));
 
+            wrapper.add(new JLabel(new ImageIcon("images/logo.png")));
             wrapper.add(panelNewResponses);
             wrapper.add(panelUncompletedQuizes);
             //wrapper.setPreferredSize(new Dimension(100,100));
@@ -97,9 +106,9 @@ public class ApplicationClient extends JFrame {
 
         YourQuizPanel() {
 
-            headings.addElement("N");
-            headings.addElement("Quiz name");
-            headings.addElement("Type");
+            headings.addElement(rb.getString("tlNumber"));
+            headings.addElement(rb.getString("tlQuizName"));
+            headings.addElement(rb.getString("tlType"));
 
             //Creates new table and adds it to the scroll pane
             dm = new DefaultTableModel(DataBaseConnector.getQuizzes(user), headings);
@@ -112,9 +121,9 @@ public class ApplicationClient extends JFrame {
             JPanel buttonsPanel = new JPanel();
             buttonsPanel.setLayout(new GridLayout(3, 1));
 
-            buttonNewQuiz = new JButton("New");
-            buttonEditQuiz = new JButton("Edit");
-            buttonDeleteQuiz = new JButton("Delete");
+            buttonNewQuiz = new JButton(rb.getString("btNew"));
+            buttonEditQuiz = new JButton(rb.getString("btEdit"));
+            buttonDeleteQuiz = new JButton(rb.getString("btDelete"));
 
             buttonsPanel.add(buttonNewQuiz);
             buttonsPanel.add(buttonEditQuiz);
@@ -128,8 +137,8 @@ public class ApplicationClient extends JFrame {
             listAssignedToUsers = new JList();
             JScrollPane spAllUsers = new JScrollPane(listAllUsers);
             JScrollPane spAssignUsers = new JScrollPane(listAssignedToUsers);
-            spAllUsers.setBorder(BorderFactory.createTitledBorder("All users:"));
-            spAssignUsers.setBorder(BorderFactory.createTitledBorder("Assigned to:"));
+            spAllUsers.setBorder(BorderFactory.createTitledBorder(rb.getString("tlAllUsers")));
+            spAssignUsers.setBorder(BorderFactory.createTitledBorder(rb.getString("tlAssignedTo")));
             spAllUsers.setPreferredSize(new Dimension(250,120));
             spAssignUsers.setPreferredSize(new Dimension(250,120));
 
@@ -156,8 +165,8 @@ public class ApplicationClient extends JFrame {
             assert(table != null):"The variable table in the instance of the inner YourQuizPanel class "+
                     "of the ApplicationClient class is null";
 
-            table.getColumn("N").setMaxWidth(50);
-            table.getColumn("Quiz name").setPreferredWidth(200);
+            table.getColumn(rb.getString("tlNumber")).setMaxWidth(50);
+            table.getColumn(rb.getString("tlQuizName")).setPreferredWidth(200);
 
             for (int c = 0; c < table.getColumnCount(); c++) {
                 Class<?> col_class = table.getColumnClass(c);
@@ -217,10 +226,10 @@ public class ApplicationClient extends JFrame {
         ResponsesPanel() {
 
             Vector<String> headings = new Vector<>();
-            headings.addElement("Date");
-            headings.addElement("Respondent");
-            headings.addElement("Quiz name");
-            headings.addElement("Type");
+            headings.addElement(rb.getString("tlDate"));
+            headings.addElement(rb.getString("tlRespondent"));
+            headings.addElement(rb.getString("tlQuizName"));
+            headings.addElement(rb.getString("tlType"));
 
             //Creates new table and adds it to the scroll pane
             JTable table = new JTable(new Vector(), headings);
@@ -229,7 +238,7 @@ public class ApplicationClient extends JFrame {
 
             JPanel buttonsPanel = new JPanel();
 
-            buttonCreateReport = new JButton("Report");
+            buttonCreateReport = new JButton(rb.getString("btReport"));
 
             buttonsPanel.add(buttonCreateReport);
 
@@ -253,12 +262,12 @@ public class ApplicationClient extends JFrame {
 
         AssignedQuizPanel() {
 
-            headings.addElement("N");
-            headings.addElement("Date");
-            headings.addElement("Quiz name");
-            headings.addElement("Author");
-            headings.addElement("Type");
-            headings.addElement("Completed");
+            headings.addElement(rb.getString("tlNumber"));
+            headings.addElement(rb.getString("tlDate"));
+            headings.addElement(rb.getString("tlQuizName"));
+            headings.addElement(rb.getString("tlAuthor"));
+            headings.addElement(rb.getString("tlType"));
+            headings.addElement(rb.getString("tlCompleted"));
 
             //Creates new table and adds it to the scroll pane
             dm = new DefaultTableModel(DataBaseConnector.getAssignedQuizzes(user), headings);
@@ -268,7 +277,7 @@ public class ApplicationClient extends JFrame {
             JScrollPane scrollPane = new JScrollPane(table);
             scrollPane.setPreferredSize(new Dimension(530, 300));
 
-            buttonStartQuiz = new JButton("Start");
+            buttonStartQuiz = new JButton(rb.getString("btStart"));
 
             JPanel buttonsPanel = new JPanel();
             buttonsPanel.add(buttonStartQuiz);
@@ -284,8 +293,8 @@ public class ApplicationClient extends JFrame {
 
         void formatTable() {
 
-            table.getColumn("N").setMaxWidth(50);
-            table.getColumn("Quiz name").setPreferredWidth(200);
+            table.getColumn(rb.getString("tlNumber")).setMaxWidth(50);
+            table.getColumn(rb.getString("tlQuizName")).setPreferredWidth(200);
 
             for (int c = 0; c < table.getColumnCount(); c++) {
                 Class<?> col_class = table.getColumnClass(c);
@@ -314,9 +323,10 @@ public class ApplicationClient extends JFrame {
                 }
             }
 
-            String info = "Everything is done!";
+            String info = rb.getString("msInfo1");
             if (newQuizzes > 0){
-                info = "You have "+newQuizzes+" uncompleted quiz"+(newQuizzes>1?"zes":"");
+                info = rb.getString("msInfo2")+newQuizzes+rb.getString("msInfo3")
+                        +(newQuizzes>1?rb.getString("msInfo4"):"");
             }
             applicationGUI.mainPanel.textUncompletedQuizes.setText(info);
 
@@ -339,7 +349,8 @@ public class ApplicationClient extends JFrame {
             yourQuizPanel = new YourQuizPanel();
             responsesPanel = new ResponsesPanel();
             assignedQuizPanel = new AssignedQuizPanel();
-            profileAction = new JComboBox(new String[]{user.toString(), "Change user"});
+            profileAction = new JComboBox(new String[]{user.toString(),
+                    rb.getString("tlChangeUser")});
 
             handler = new ApplicationHandler();
 
@@ -356,10 +367,10 @@ public class ApplicationClient extends JFrame {
             assignedQuizPanel.buttonStartQuiz.addActionListener(handler);
 
             tabbedPane = new JTabbedPane();
-            tabbedPane.addTab("Main", mainPanel);
-            tabbedPane.add("Your Quizzes", yourQuizPanel);
-            tabbedPane.add("Responses", responsesPanel);
-            tabbedPane.add("Assigned Quizzes", assignedQuizPanel);
+            tabbedPane.addTab(rb.getString("tlMain"), mainPanel);
+            tabbedPane.add(rb.getString("tlYourQuizzes"), yourQuizPanel);
+            tabbedPane.add(rb.getString("tlResponses"), responsesPanel);
+            tabbedPane.add(rb.getString("tlAssignedQuizzes"), assignedQuizPanel);
 
             //tabbedPane.setSelectedIndex(1);
 
@@ -390,7 +401,7 @@ public class ApplicationClient extends JFrame {
 
                 Quiz currQuiz = applicationGUI.yourQuizPanel.getCurrentQuiz();
                 if (currQuiz == null) {
-                    JOptionPane.showMessageDialog(ApplicationClient.this, "Select the Quiz");
+                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheQuiz"));
                     return;
                 }
                 new QuizEditingClient(ApplicationClient.this, currQuiz);
@@ -441,5 +452,19 @@ public class ApplicationClient extends JFrame {
             applicationGUI.yourQuizPanel.refreshUserLists();
 
         }
+    }
+
+    public static boolean fieldIsCorrect(String s, int maxLength, String fieldName){
+
+        s = s.trim();
+        if (s.length() > 0 && s.length() <= maxLength){
+            return true;
+        }else {
+            JOptionPane.showMessageDialog(null, fieldName + rb.getString("msCheckValue4")
+                            + maxLength + rb.getString("msCheckValue2"), rb.getString("msCheckValue3"),
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        return false;
     }
 }
