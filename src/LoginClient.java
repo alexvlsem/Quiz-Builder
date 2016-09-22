@@ -74,6 +74,11 @@ public class LoginClient extends JFrame {
 
             login = new JTextField(15);
             password = new JPasswordField();
+
+            //Only for testing
+            login.setText("al");
+            password.setText("123");
+
             buttonSignIn = new JButton(rb.getString("btSignIn"));
 
             setLayout(new GridBagLayout());
@@ -445,6 +450,9 @@ public class LoginClient extends JFrame {
 
         loadSettings();
 
-        new LoginClient();
+        LoginClient lc = new LoginClient();
+
+        //Only for testing
+        lc.loginPanelGUI.loginPanel.buttonSignIn.doClick();
     }
 }

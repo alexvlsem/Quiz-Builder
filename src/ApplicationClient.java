@@ -20,7 +20,6 @@ public class ApplicationClient extends JFrame {
 
     private User user;
     private ApplicationGUI applicationGUI;
-    private Container container;
 
     public ApplicationClient(User user) {
         this.user = user;
@@ -28,7 +27,7 @@ public class ApplicationClient extends JFrame {
         applicationGUI = new ApplicationGUI();
         applicationGUI.assignedQuizPanel.refreshInfo();
 
-        container = getContentPane();
+        Container container = getContentPane();
         container.setLayout(new BorderLayout());
         container.add(applicationGUI, BorderLayout.CENTER);
 
@@ -331,6 +330,16 @@ public class ApplicationClient extends JFrame {
             applicationGUI.mainPanel.textUncompletedQuizes.setText(info);
 
         }
+
+        Quiz getCurrentQuiz() {
+
+            Quiz currQuiz = null;
+            int rowInd = table.getSelectedRow();
+            if (rowInd >= 0) {
+                currQuiz = (Quiz) table.getValueAt(rowInd, 2);
+            }
+            return currQuiz;
+        }
     }
 
     private class ApplicationGUI extends JPanel {
@@ -372,7 +381,7 @@ public class ApplicationClient extends JFrame {
             tabbedPane.add(rb.getString("tlResponses"), responsesPanel);
             tabbedPane.add(rb.getString("tlAssignedQuizzes"), assignedQuizPanel);
 
-            //tabbedPane.setSelectedIndex(1);
+            tabbedPane.setSelectedIndex(3);
 
             JPanel actionWrapper = new JPanel();
             actionWrapper.add(profileAction);
@@ -408,7 +417,15 @@ public class ApplicationClient extends JFrame {
                 applicationGUI.yourQuizPanel.refreshQuizTable();
 
             } else if (e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz) {
-                new QuizTakingClient(ApplicationClient.this);
+
+                Quiz currQuiz = applicationGUI.assignedQuizPanel.getCurrentQuiz();
+                if (currQuiz == null) {
+                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheQuiz"));
+                    return;
+                }
+                new QuizTakingClient(ApplicationClient.this, currQuiz, user);
+                applicationGUI.assignedQuizPanel.refreshTable();
+
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonAddUsers) {
                 ArrayList<User> userList = new ArrayList<>(
                         applicationGUI.yourQuizPanel.listAllUsers.getSelectedValuesList());
@@ -464,7 +481,6 @@ public class ApplicationClient extends JFrame {
                             + maxLength + rb.getString("msCheckValue2"), rb.getString("msCheckValue3"),
                     JOptionPane.ERROR_MESSAGE);
         }
-
         return false;
     }
 }

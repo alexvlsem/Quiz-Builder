@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.ResourceBundle;
 import javax.swing.*;
 
 /**
@@ -9,6 +10,7 @@ import javax.swing.*;
  */
 public class ReportClient extends JDialog {
 
+    private ResourceBundle rb = LoginClient.rb;
     private ReportGUI reportGUI;
     private User respondent;
     private Quiz quiz;
@@ -21,7 +23,7 @@ public class ReportClient extends JDialog {
 
         ReportGUI() {
 
-            buttonSaveToTheFile = new JButton("Save to the file");
+            buttonSaveToTheFile = new JButton(rb.getString("btSaveToTheFile"));
 
             textArea = new JTextArea(30, 50);
             JScrollPane scrollPane = new JScrollPane(textArea);
@@ -49,7 +51,7 @@ public class ReportClient extends JDialog {
         container.setLayout(new BorderLayout());
         container.add(reportGUI, BorderLayout.CENTER);
 
-        setTitle("Quiz Builder (Report)");
+        setTitle("Quiz Builder (" + rb.getString("tlReport") + ")");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         pack();
@@ -57,10 +59,5 @@ public class ReportClient extends JDialog {
         setLocationRelativeTo(null);
         setVisible(true);
         validate();
-    }
-
-    //Only to test the form
-    public static void main(String[] args) {
-        new ReportClient(null);
     }
 }

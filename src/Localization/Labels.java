@@ -81,7 +81,17 @@ public class Labels extends ListResourceBundle{
 
                 //AnswerEditingClient
                 {"tlAnswerEditing","Answer Editing"},
-                {"lbRightAnswer","Right answer"}
+                {"lbRightAnswer","Right answer"},
+
+                //ReportClient
+                {"btSaveToTheFile","Save to the file"},
+                {"tlReport","Report"},
+
+                //QuizTakingClient
+                {"btNext","Next"},
+                {"btFinish","Finish"},
+                {"tlAllQuestions","All questions"},
+                {"tlQuizTaking","Quiz Taking"},
         };
     }
 }

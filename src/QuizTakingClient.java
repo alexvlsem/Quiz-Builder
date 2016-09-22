@@ -1,9 +1,17 @@
 import javax.jws.soap.SOAPBinding;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.xml.parsers.FactoryConfigurationError;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.Vector;
 
 /**
  * The QuizTakingClient class creates a form for taking a quiz;
@@ -13,10 +21,10 @@ import java.awt.event.ActionListener;
  */
 public class QuizTakingClient extends JDialog {
 
+    private ResourceBundle rb = LoginClient.rb;
     private QuizTakingGUI quizTakingGUI;
     private Quiz quiz;
     private User respondent;
-    private Container container;
 
     private class QuizTakingGUI extends JPanel {
 
@@ -25,28 +33,41 @@ public class QuizTakingClient extends JDialog {
         JList questionList;
         JButton buttonNextQuestion,
                 buttonSaveAnswer, buttonFinishQuiz;
+        JScrollPane scrollPaneAnswers;
 
         QuizTakingGUI() {
 
-            questionText = new JTextArea(8, 25);
-            questionText.setBorder(BorderFactory.createTitledBorder("Question"));
-            answerPanel = buildAnswerPanel();
+            questionText = new JTextArea();
+            questionText.setEditable(false);
+            JScrollPane scrollPaneText = new JScrollPane(questionText);
+            scrollPaneText.setBorder(BorderFactory.createTitledBorder(rb.getString("tlQuestion")));
+            scrollPaneText.setPreferredSize(new Dimension(300, 200));
 
-            buttonNextQuestion = new JButton("Next");
-            buttonSaveAnswer = new JButton("Save");
-            buttonFinishQuiz = new JButton("Finish");
+            scrollPaneAnswers = new JScrollPane();
+            scrollPaneAnswers.setPreferredSize(new Dimension(300, 200));
+
+            buttonNextQuestion = new JButton(rb.getString("btNext"));
+            buttonSaveAnswer = new JButton(rb.getString("btSave"));
+            buttonFinishQuiz = new JButton(rb.getString("btFinish"));
 
             JPanel leftPanel = new JPanel();
             leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
             leftPanel.add(buttonNextQuestion);
-            leftPanel.add(questionText);
+            leftPanel.add(scrollPaneText);
             leftPanel.add(buttonSaveAnswer);
-            leftPanel.add(answerPanel);
+            leftPanel.add(scrollPaneAnswers);
 
-            questionList = new JList();
-            JScrollPane scrollPaneAllQuestions = new JScrollPane();
-            scrollPaneAllQuestions.add(questionList);
-            scrollPaneAllQuestions.setBorder(BorderFactory.createTitledBorder("All questions"));
+            DefaultListModel<Question> lm = new DefaultListModel<>();
+            Vector rows = DataBaseConnector.getQuestions(quiz);
+            for (Object row : rows) {
+                lm.addElement((Question) ((Vector) row).get(1));
+            }
+            questionList = new JList(lm);
+            questionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+            JScrollPane scrollPaneAllQuestions = new JScrollPane(questionList);
+            scrollPaneAllQuestions.setBorder(
+                    BorderFactory.createTitledBorder(rb.getString("tlAllQuestions")));
             scrollPaneAllQuestions.setPreferredSize(new Dimension(150, 300));
 
             JPanel rightPanel = new JPanel();
@@ -57,18 +78,29 @@ public class QuizTakingClient extends JDialog {
             add(leftPanel);
             add(rightPanel);
 
+            QuizTakingHandler handler = new QuizTakingHandler();
+            buttonNextQuestion.addActionListener(handler);
+            buttonFinishQuiz.addActionListener(handler);
+            buttonSaveAnswer.addActionListener(handler);
+            questionList.addListSelectionListener(handler);
+
         }
 
 
-        JPanel buildAnswerPanel() {
+        JPanel buildAnswerPanel(Question question) {
 
-            //There will be a query to the database to get list of possible answers for the question.
+            Vector rows = DataBaseConnector.getAnswers(question);
+
 
             JPanel panel = new JPanel();
             panel.setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
 
-            for (int i = 0; i < 4; i++) {
+            for(Object row: rows) {
+
+                int i = rows.indexOf(row);
+
+
 
                 JCheckBox checkBox = new JCheckBox();
                 c.fill = GridBagConstraints.HORIZONTAL;
@@ -77,14 +109,14 @@ public class QuizTakingClient extends JDialog {
                 panel.add(checkBox, c);
 
                 JTextField number = new JTextField();
-                number.setText("" + (i + 1));
+                number.setText("" + ((Vector) row).get(0));
                 c.fill = GridBagConstraints.HORIZONTAL;
                 c.gridx = 1;
                 c.gridy = i;
                 panel.add(number, c);
 
                 JTextField textField = new JTextField(20);
-                textField.setText("Answer " + (i + 1));
+                textField.setText(((Answer)((Vector) row).get(1)).getText());
                 c.fill = GridBagConstraints.HORIZONTAL;
                 c.gridx = 2;
                 c.gridy = i;
@@ -96,24 +128,55 @@ public class QuizTakingClient extends JDialog {
         }
     }
 
-    private class QuizTakingHandler implements ActionListener {
+    private class QuizTakingHandler implements ActionListener, ListSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            if (e.getSource().equals(quizTakingGUI.buttonNextQuestion)) {
 
+                ListModel lm = quizTakingGUI.questionList.getModel();
+                int currInd = quizTakingGUI.questionList.getSelectedIndex();
+                if (lm.getSize() > 0 && currInd < lm.getSize()) {
+                    quizTakingGUI.questionList.setSelectedIndex(++currInd);
+                }
+            }
+
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting()) {
+                return;
+            }
+
+            if (e.getSource() == quizTakingGUI.questionList) {
+
+                Question currQuestion = (Question) quizTakingGUI.questionList.getSelectedValue();
+                quizTakingGUI.questionText.setText(currQuestion.getText());
+                quizTakingGUI.questionText.setCaretPosition(0);
+
+                quizTakingGUI.scrollPaneAnswers.setViewportView(quizTakingGUI.buildAnswerPanel(currQuestion));
+
+            }
         }
     }
 
-    public QuizTakingClient(ApplicationClient frame) {
+    public QuizTakingClient(ApplicationClient frame, Quiz quiz, User respondent) {
         super(frame, true);
+        this.quiz = quiz;
+        this.respondent = respondent;
 
         quizTakingGUI = new QuizTakingGUI();
 
-        container = getContentPane();
+        if (quizTakingGUI.questionList.getModel().getSize() > 0) {
+            quizTakingGUI.questionList.setSelectedIndex(0);
+        }
+
+        Container container = getContentPane();
         container.setLayout(new BorderLayout());
         container.add(quizTakingGUI, BorderLayout.CENTER);
 
-        setTitle("Quiz-Builder (Quiz Taking)");
+        setTitle("Quiz-Builder (" + rb.getString("tlQuizTaking") + ")");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         pack();
@@ -122,10 +185,4 @@ public class QuizTakingClient extends JDialog {
         setVisible(true);
         validate();
     }
-
-    //Only to test the form
-    public static void main(String[] args) {
-        new QuizTakingClient(null);
-    }
-
 }
