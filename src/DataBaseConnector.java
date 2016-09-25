@@ -1,3 +1,4 @@
+
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -28,7 +29,7 @@ public class DataBaseConnector {
     }
 
     public static boolean connectionStatus() {
-        return conn == null ? false : true;
+        return conn != null;
     }
 
     public static void closeConnection() {
@@ -131,7 +132,7 @@ public class DataBaseConnector {
         }
     }
 
-    public static void createQuizResponsesTable(
+    private static void createQuizResponsesTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "QuizResponses", null);
         if (!tables.next()) {
@@ -139,7 +140,8 @@ public class DataBaseConnector {
                     "(respondentId NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
                     " quizId       INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id)," +
                     " questionId   INTEGER NOT NULL FOREIGN KEY REFERENCES Questions(id)," +
-                    " answerId     INTEGER FOREIGN KEY REFERENCES Answers(id))";
+                    " answerId     INTEGER NOT NULL FOREIGN KEY REFERENCES Answers(id)," +
+                    " isSelected   BIT NOT NULL)";
 
             stmt.executeUpdate(sql);
         }
@@ -150,8 +152,11 @@ public class DataBaseConnector {
         ArrayList<String> userData = new ArrayList<>();
 
         try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT firstName, lastName FROM Users WHERE login='" + prm[0] + "' AND password= '" + prm[1] + "'");
+            ResultSet rs = stmt.executeQuery("SELECT " +
+                    "firstName, " +
+                    "lastName " +
+                    "FROM Users " +
+                    "WHERE login='" + prm[0] + "' AND password= '" + prm[1] + "'");
             if (rs.next()) {
                 userData.add(rs.getString(1));
                 userData.add(rs.getString(2));
@@ -231,7 +236,8 @@ public class DataBaseConnector {
                 Vector row = new Vector();
 
                 row.add(++num);
-                Quiz quiz = new Quiz(rs.getInt("id"), rs.getString("name"), QuizTypes.valueOf(rs.getString("type")), user);
+                Quiz quiz = new Quiz(rs.getInt("id"), rs.getString("name"),
+                        QuizTypes.valueOf(rs.getString("type")), user);
 
                 row.add(quiz);
                 row.add(quiz.getType());
@@ -354,7 +360,8 @@ public class DataBaseConnector {
             while (rs.next()) {
                 Vector row = new Vector();
                 row.add(++num);
-                Answer answer = new Answer(rs.getInt("id"), rs.getString("text"), rs.getBoolean("correctness"), question);
+                Answer answer = new Answer(rs.getInt("id"), rs.getString("text"),
+                        rs.getBoolean("correctness"), question);
                 row.add(answer);
                 row.add(answer.getCorrectness());
 
@@ -370,12 +377,21 @@ public class DataBaseConnector {
 
         ArrayList<User> users = new ArrayList<>();
 
-        String query = "SELECT * FROM Users WHERE login " + (inclusive ? "NOT" : "") + " IN " +
-                "(SELECT userId FROM AssignedQuizzes WHERE quizId =? AND quizCompleted =?)";
+        String query;
+
+        if (inclusive) {
+            query = "SELECT * FROM Users WHERE login NOT IN " +
+                    "(SELECT userId FROM AssignedQuizzes WHERE quizId =?)";
+        } else {
+            query = "SELECT * FROM Users WHERE login IN " +
+                    "(SELECT userId FROM AssignedQuizzes WHERE quizId =? AND quizCompleted =?)";
+        }
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setInt(1, quiz.getId());
-            pstm.setBoolean(2, false);
+            if (!inclusive) {
+                pstm.setBoolean(2, false);
+            }
             ResultSet rs = pstm.executeQuery();
             while (rs.next()) {
                 users.add(new User(rs.getString("login"), rs.getString("firstName"), rs.getString("lastName")));
@@ -453,8 +469,10 @@ public class DataBaseConnector {
                 Vector row = new Vector();
                 row.add(++num);
                 row.add(rs.getDate("assignDate"));
-                User author = new User(rs.getString("authorId"), rs.getString("authorFirstName"), rs.getString("authorLastName"));
-                Quiz quiz = new Quiz(rs.getInt("quizID"), rs.getString("quizName"), QuizTypes.valueOf(rs.getString("quizType")), author);
+                User author = new User(rs.getString("authorId"), rs.getString("authorFirstName"),
+                        rs.getString("authorLastName"));
+                Quiz quiz = new Quiz(rs.getInt("quizID"), rs.getString("quizName"),
+                        QuizTypes.valueOf(rs.getString("quizType")), author);
                 row.add(quiz);
                 row.add(author);
                 row.add(quiz.getType());
@@ -465,6 +483,207 @@ public class DataBaseConnector {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return rows;
+    }
+
+    public static void saveResponses(Vector rows, User respondent) {
+
+        String queryDel = "DELETE FROM QuizResponses WHERE respondentId=? AND answerId=?";
+        String queryAdd = "INSERT INTO QuizResponses (respondentId, quizId, questionId, answerId, isSelected) " +
+                " VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmDel = conn.prepareStatement(queryDel);
+             PreparedStatement pstmAdd = conn.prepareStatement(queryAdd)) {
+
+            for (Object object : rows) {
+
+                Vector row = (Vector) object;
+
+                boolean isSelected = (boolean) row.get(0);
+                Answer answer = (Answer) row.get(1);
+
+                //removes old records
+                pstmDel.setString(1, respondent.getLogin());
+                pstmDel.setInt(2, answer.getId());
+                pstmDel.addBatch();
+
+                //writes new records
+                pstmAdd.setString(1, respondent.getLogin());
+                pstmAdd.setInt(2, answer.getQuestion().getQuiz().getId());
+                pstmAdd.setInt(3, answer.getQuestion().getId());
+                pstmAdd.setInt(4, answer.getId());
+                pstmAdd.setBoolean(5, isSelected);
+                pstmAdd.addBatch();
+            }
+            pstmDel.executeBatch();
+            pstmAdd.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Vector getMarkedAnswers(User respondent, Question question) {
+
+        Vector rows = new Vector();
+
+        String query = "SELECT\n" +
+                "  Answers.id,\n" +
+                "  Answers.text,\n" +
+                "  Answers.correctness,\n" +
+                "  Responses.isSelected\n" +
+                "FROM Answers\n" +
+                "  LEFT JOIN\n" +
+                "  (SELECT\n" +
+                "     QuizResponses.isSelected,\n" +
+                "     QuizResponses.answerId\n" +
+                "   FROM QuizResponses\n" +
+                "   WHERE QuizResponses.respondentId = ?) AS Responses\n" +
+                "    ON Answers.id = Responses.answerId\n" +
+                "WHERE Answers.questionId = ?\n" +
+                "ORDER BY Answers.id";
+
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+
+            pstm.setString(1, respondent.getLogin());
+            pstm.setInt(2, question.getId());
+            ResultSet rs = pstm.executeQuery();
+
+            int num = 0;
+            while (rs.next()) {
+                Vector row = new Vector();
+                row.add(++num);
+                Answer answer = new Answer(rs.getInt("id"), rs.getString("text"),
+                        rs.getBoolean("correctness"), question);
+                row.add(answer);
+                row.add(rs.getBoolean("isSelected"));
+
+                rows.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public static void finishQuiz(User respondent, Quiz quiz) {
+        String query = "UPDATE AssignedQuizzes \n" +
+                "SET AssignedQuizzes.completeDate=?, AssignedQuizzes.quizCompleted=? \n" +
+                "WHERE AssignedQuizzes.quizId=? AND AssignedQuizzes.userId= ?";
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            pstm.setDate(1, new Date(System.currentTimeMillis()));
+            pstm.setBoolean(2, true);
+            pstm.setInt(3, quiz.getId());
+            pstm.setString(4, respondent.getLogin());
+
+            pstm.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Vector getCompletedQuizzes(User user) {
+
+        Vector rows = new Vector();
+
+        String query = "SELECT\n" +
+                "  AssignedQuizzes.userId,\n" +
+                "  AssignedQuizzes.quizId,\n" +
+                "  AssignedQuizzes.completeDate,\n" +
+                "  Quizzes.name AS quizName,\n" +
+                "  Quizzes.type AS quizType,\n" +
+                "  Users.firstName,\n" +
+                "  Users.lastName\n" +
+                "FROM AssignedQuizzes\n" +
+                "INNER JOIN Quizzes ON AssignedQuizzes.quizId = Quizzes.id\n" +
+                "INNER JOIN Users ON AssignedQuizzes.userId = Users.login\n" +
+                "WHERE Quizzes.ownerId = ? AND AssignedQuizzes.quizCompleted = ?";
+
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            pstm.setString(1, user.getLogin());
+            pstm.setBoolean(2, true);
+            ResultSet rs = pstm.executeQuery();
+
+            int num = 0;
+            while (rs.next()) {
+                Vector row = new Vector();
+
+                row.add(rs.getDate("completeDate"));
+                User respondent = new User(rs.getString("userId"), rs.getString("firstName"),
+                        rs.getString("lastName"));
+                Quiz quiz = new Quiz(rs.getInt("quizId"), rs.getString("quizName"),
+                        QuizTypes.valueOf(rs.getString("quizType")), user);
+                row.add(respondent);
+                row.add(quiz);
+                row.add(quiz.getType());
+                rows.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    static Vector getQuizResults(User respondent, Quiz quiz) {
+        Vector rows = new Vector();
+
+        String query = "SELECT\n" +
+                "  Questions.id AS questionId,\n" +
+                "  Questions.name AS questionName,\n" +
+                "  Questions.text AS questionText,\n" +
+                "  Questions.multipleChoice AS multipleChoice,\n" +
+                "  tbAnswers.id AS answerId,\n" +
+                "  tbAnswers.text AS answerText,\n" +
+                "  tbAnswers.correctness AS correctAnswer,\n" +
+                "  tbAnswers.isSelected AS selectedAnswer\n" +
+                "FROM  Questions\n" +
+                "INNER JOIN\n" +
+                "(SELECT\n" +
+                "  Answers.questionId,\n" +
+                "  Answers.id,\n" +
+                "  Answers.text,\n" +
+                "  Answers.correctness,\n" +
+                "  Responses.isSelected\n" +
+                "FROM Answers\n" +
+                "  LEFT JOIN\n" +
+                "  (SELECT\n" +
+                "   QuizResponses.isSelected,\n" +
+                "     QuizResponses.answerId\n" +
+                "   FROM QuizResponses\n" +
+                "   WHERE QuizResponses.respondentId = ?) AS Responses\n" +
+                "    ON Answers.id = Responses.answerId) AS tbAnswers\n" +
+                "ON tbAnswers.questionId = Questions.id\n" +
+                "WHERE Questions.quizId = ?\n" +
+                "ORDER BY questionId, answerId";
+
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+
+            pstm.setString(1, respondent.getLogin());
+            pstm.setInt(2, quiz.getId());
+            ResultSet rs = pstm.executeQuery();
+
+            Question currQuestion = null;
+
+            while (rs.next()) {
+
+                if (currQuestion == null || currQuestion.getId() != rs.getInt("questionId")){
+                currQuestion = new Question(rs.getInt("questionId"), rs.getString("questionName"),
+                        rs.getString("questionText"), rs.getBoolean("multipleChoice"), quiz);
+                }
+                Answer currAnswer = new Answer(rs.getInt("answerId"), rs.getString("answerText"),
+                        rs.getBoolean("correctAnswer"), currQuestion);
+                Vector row = new Vector();
+                row.add(currQuestion);
+                row.add(currAnswer);
+                row.add(rs.getBoolean("selectedAnswer"));
+                rows.add(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
         return rows;
     }
 }

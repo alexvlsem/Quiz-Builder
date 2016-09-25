@@ -4,9 +4,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -27,7 +24,6 @@ public class LoginClient extends JFrame {
     public static ResourceBundle rb;
 
     private LoginPanelGUI loginPanelGUI;
-    private Container container;
     private JTabbedPane tabbedPane;
 
     /**
@@ -76,15 +72,15 @@ public class LoginClient extends JFrame {
             password = new JPasswordField();
 
             //Only for testing
-            login.setText("al");
-            password.setText("123");
+            //login.setText("al");
+            //password.setText("123");
 
             buttonSignIn = new JButton(rb.getString("btSignIn"));
 
             setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
 
-            JLabel logoLabel = new JLabel(new ImageIcon("images/logo.png"));
+            JLabel logoLabel = new JLabel(createImageIcon("images/logo.png"));
 
             c.fill = GridBagConstraints.HORIZONTAL;
             c.gridx = 0;
@@ -335,7 +331,7 @@ public class LoginClient extends JFrame {
                         InterfaceLanguages) loginPanelGUI.settingsPanel.boxLanguage.getSelectedItem());
                 try {
                     ObjectOutputStream os = new ObjectOutputStream(
-                            new FileOutputStream("settings.txt"));
+                            new FileOutputStream(new File(LoginClient.class.getResource("").getFile(),"settings.txt")));
                     os.writeObject(settings);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
@@ -375,7 +371,7 @@ public class LoginClient extends JFrame {
 
         loginPanelGUI = new LoginPanelGUI();
 
-        container = getContentPane();
+        Container container = getContentPane();
         container.setLayout(new BorderLayout());
         container.add(loginPanelGUI, BorderLayout.CENTER);
 
@@ -417,13 +413,14 @@ public class LoginClient extends JFrame {
      * instantiates the settings and rb variables.
      */
     private static void loadSettings() {
-        Path fileSettings = Paths.get("settings.txt");
-        if (Files.exists(fileSettings)) {
+
+        if (LoginClient.class.getResource("settings.txt") != null) {
             try {
                 ObjectInputStream ois = new ObjectInputStream(
-                        new FileInputStream(fileSettings.toFile()));
+                        new FileInputStream(LoginClient.class.getResource("settings.txt").getFile()));
                 settings = (Settings) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
 
@@ -453,6 +450,17 @@ public class LoginClient extends JFrame {
         LoginClient lc = new LoginClient();
 
         //Only for testing
-        lc.loginPanelGUI.loginPanel.buttonSignIn.doClick();
+        //lc.loginPanelGUI.loginPanel.buttonSignIn.doClick();
+    }
+
+    /** Returns an ImageIcon, or null if the path was invalid. */
+    protected static ImageIcon createImageIcon(String path) {
+        java.net.URL imgURL = LoginClient.class.getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
     }
 }

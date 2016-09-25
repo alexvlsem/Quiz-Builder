@@ -61,6 +61,8 @@ public class Labels_ru_RU extends ListResourceBundle {
                 {"tlAssignedQuizzes","Назначенные Квизы"},
                 {"msSelectTheQuiz","Выберите квиз"},
                 {"msCheckValue4"," не может быть пустым или превышать "},
+                {"msQuizIsCompleted","Квиз завершен!"},
+                {"msSelectTheResponse","Выберите ответ"},
 
                 //QuizEditingClient
                 {"tlQuizEditing","Редактирование квиза"},
@@ -80,7 +82,18 @@ public class Labels_ru_RU extends ListResourceBundle {
 
                 //AnswerEditingClient
                 {"tlAnswerEditing","Редактирование Ответа"},
-                {"lbRightAnswer","Правильный ответ"}
+                {"lbRightAnswer","Правильный ответ"},
+
+                //ReportClient
+                {"btSaveToTheFile","Сохранить в файл"},
+                {"tlReport","Отчет"},
+
+                //QuizTakingClient
+                {"btNext","Следующий"},
+                {"btFinish","Закончить"},
+                {"btPrevious","Предыдущий"},
+                {"tlAllQuestions","Все вопросы"},
+                {"tlQuizTaking","Прохождение Квиза"},
         };
     }
 }

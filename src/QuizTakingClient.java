@@ -1,15 +1,10 @@
-import javax.jws.soap.SOAPBinding;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.xml.parsers.FactoryConfigurationError;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.awt.event.*;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -28,12 +23,13 @@ public class QuizTakingClient extends JDialog {
 
     private class QuizTakingGUI extends JPanel {
 
-        JPanel answerPanel;
         JTextArea questionText;
         JList questionList;
-        JButton buttonNextQuestion,
+        JButton buttonPreviousQuestion, buttonNextQuestion,
                 buttonSaveAnswer, buttonFinishQuiz;
         JScrollPane scrollPaneAnswers;
+        JPanel answerPanel;
+        Vector answerList = new Vector();
 
         QuizTakingGUI() {
 
@@ -41,22 +37,32 @@ public class QuizTakingClient extends JDialog {
             questionText.setEditable(false);
             JScrollPane scrollPaneText = new JScrollPane(questionText);
             scrollPaneText.setBorder(BorderFactory.createTitledBorder(rb.getString("tlQuestion")));
-            scrollPaneText.setPreferredSize(new Dimension(300, 200));
+            scrollPaneText.setPreferredSize(new Dimension(400, 200));
 
             scrollPaneAnswers = new JScrollPane();
-            scrollPaneAnswers.setPreferredSize(new Dimension(300, 200));
+            scrollPaneAnswers.setPreferredSize(new Dimension(400, 200));
 
+            buttonPreviousQuestion = new JButton(rb.getString("btPrevious"));
             buttonNextQuestion = new JButton(rb.getString("btNext"));
             buttonSaveAnswer = new JButton(rb.getString("btSave"));
             buttonFinishQuiz = new JButton(rb.getString("btFinish"));
 
+            //makes equal width for navigation buttons
+            JPanel btPanel = new JPanel();
+            btPanel.setLayout(new GridLayout(1, 2));
+            btPanel.add(buttonPreviousQuestion);
+            btPanel.add(buttonNextQuestion);
+            JPanel wrapPanel = new JPanel();
+            wrapPanel.add(btPanel);
+
             JPanel leftPanel = new JPanel();
             leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-            leftPanel.add(buttonNextQuestion);
+            leftPanel.add(wrapPanel);
             leftPanel.add(scrollPaneText);
             leftPanel.add(buttonSaveAnswer);
             leftPanel.add(scrollPaneAnswers);
 
+            //fill the list of questions
             DefaultListModel<Question> lm = new DefaultListModel<>();
             Vector rows = DataBaseConnector.getQuestions(quiz);
             for (Object row : rows) {
@@ -68,62 +74,81 @@ public class QuizTakingClient extends JDialog {
             JScrollPane scrollPaneAllQuestions = new JScrollPane(questionList);
             scrollPaneAllQuestions.setBorder(
                     BorderFactory.createTitledBorder(rb.getString("tlAllQuestions")));
-            scrollPaneAllQuestions.setPreferredSize(new Dimension(150, 300));
+            scrollPaneAllQuestions.setPreferredSize(new Dimension(200, 400));
 
             JPanel rightPanel = new JPanel();
             rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
             rightPanel.add(scrollPaneAllQuestions);
             rightPanel.add(buttonFinishQuiz);
 
+            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             add(leftPanel);
             add(rightPanel);
+            setBorder(new EmptyBorder(10, 10, 10, 10));
 
             QuizTakingHandler handler = new QuizTakingHandler();
+            buttonPreviousQuestion.addActionListener(handler);
             buttonNextQuestion.addActionListener(handler);
             buttonFinishQuiz.addActionListener(handler);
             buttonSaveAnswer.addActionListener(handler);
             questionList.addListSelectionListener(handler);
-
         }
 
-
+        /**
+         * Creates new panel of possible answers of the chosen question.
+         *
+         * @param question a current question.
+         * @return panel with answers.
+         */
         JPanel buildAnswerPanel(Question question) {
-
-            Vector rows = DataBaseConnector.getAnswers(question);
-
+            answerList.removeAllElements();
 
             JPanel panel = new JPanel();
             panel.setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.HORIZONTAL;
 
-            for(Object row: rows) {
+            ButtonGroup group = new ButtonGroup();
 
-                int i = rows.indexOf(row);
+            Vector rows = DataBaseConnector.getMarkedAnswers(respondent,question);
+            for (int i = 0; i < rows.size(); i++) {
+                Vector currRow = (Vector) rows.get(i);
 
+                Answer currAnswer =  (Answer) currRow.get(1);
+                boolean isSelected = (boolean) currRow.get(2);
 
-
-                JCheckBox checkBox = new JCheckBox();
-                c.fill = GridBagConstraints.HORIZONTAL;
                 c.gridx = 0;
                 c.gridy = i;
-                panel.add(checkBox, c);
+                if (question.getMultipleChoice()) {
+                    JCheckBox checkBox = new JCheckBox();
+                    checkBox.setSelected(isSelected);
+                    panel.add(checkBox, c);
+                } else {
+                    JRadioButton rButton = new JRadioButton();
+                    rButton.setSelected(isSelected);
+                    group.add(rButton);
+                    panel.add(rButton, c);
+                }
 
                 JTextField number = new JTextField();
-                number.setText("" + ((Vector) row).get(0));
-                c.fill = GridBagConstraints.HORIZONTAL;
+                number.setEditable(false);
+                number.setText(""+currRow.get(0));
                 c.gridx = 1;
                 c.gridy = i;
                 panel.add(number, c);
 
-                JTextField textField = new JTextField(20);
-                textField.setText(((Answer)((Vector) row).get(1)).getText());
-                c.fill = GridBagConstraints.HORIZONTAL;
+                JTextArea textArea = new JTextArea();
+                textArea.setEditable(false);
+                textArea.setText(currAnswer.getText());
                 c.gridx = 2;
                 c.gridy = i;
-                panel.add(textField, c);
+                panel.add(textArea, c);
 
+                Vector rowAL = new Vector();
+                rowAL.add(false);
+                rowAL.add(currAnswer);
+                answerList.add(rowAL);
             }
-
             return panel;
         }
     }
@@ -139,8 +164,37 @@ public class QuizTakingClient extends JDialog {
                 if (lm.getSize() > 0 && currInd < lm.getSize()) {
                     quizTakingGUI.questionList.setSelectedIndex(++currInd);
                 }
-            }
+            } else if (e.getSource().equals(quizTakingGUI.buttonPreviousQuestion)) {
+                ListModel lm = quizTakingGUI.questionList.getModel();
+                int currInd = quizTakingGUI.questionList.getSelectedIndex();
+                if (lm.getSize() > 0 && currInd > 0) {
+                    quizTakingGUI.questionList.setSelectedIndex(--currInd);
+                }
+            } else if (e.getSource().equals(quizTakingGUI.buttonSaveAnswer)) {
 
+                /* Depends on the structure of the variable quizTakingGUI.answerPanel.
+                Iterates through JPanel; each third component starting from zero
+                is JCheckBox or JRadioButton */
+                Component componentArr[] = quizTakingGUI.answerPanel.getComponents();
+                for (int i = 0; i < componentArr.length; i += 3) {
+                    Component component = componentArr[i];
+                    boolean isSelected = false;
+                    if (component instanceof JRadioButton) {
+                        JRadioButton currButton = (JRadioButton) component;
+                        isSelected = currButton.isSelected();
+                    } else if (component instanceof JCheckBox) {
+                        JCheckBox currButton = (JCheckBox) component;
+                        isSelected = currButton.isSelected();
+                    }
+                    Vector row = (Vector) quizTakingGUI.answerList.get(i / 3);
+                    row.set(0,isSelected);
+                }
+                DataBaseConnector.saveResponses(quizTakingGUI.answerList,respondent);
+
+            } else if (e.getSource().equals(quizTakingGUI.buttonFinishQuiz)) {
+                DataBaseConnector.finishQuiz(respondent,quiz);
+                QuizTakingClient.this.dispose();
+            }
         }
 
         @Override
@@ -149,13 +203,24 @@ public class QuizTakingClient extends JDialog {
                 return;
             }
 
-            if (e.getSource() == quizTakingGUI.questionList) {
+            if (e.getSource().equals(quizTakingGUI.questionList)) {
 
                 Question currQuestion = (Question) quizTakingGUI.questionList.getSelectedValue();
-                quizTakingGUI.questionText.setText(currQuestion.getText());
-                quizTakingGUI.questionText.setCaretPosition(0);
+                quizTakingGUI.questionText.setText(currQuestion.getText()); //Set the text of the question
+                quizTakingGUI.questionText.setCaretPosition(0); //move to the top
 
-                quizTakingGUI.scrollPaneAnswers.setViewportView(quizTakingGUI.buildAnswerPanel(currQuestion));
+                //set the answer panel
+                quizTakingGUI.answerPanel = quizTakingGUI.buildAnswerPanel(currQuestion);
+                quizTakingGUI.scrollPaneAnswers.setViewportView(quizTakingGUI.answerPanel);
+
+                //move scroll bars to the top and left.
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        quizTakingGUI.scrollPaneAnswers.getVerticalScrollBar().setValue(0);
+                        quizTakingGUI.scrollPaneAnswers.getHorizontalScrollBar().setValue(0);
+                    }
+                });
 
             }
         }

@@ -62,6 +62,8 @@ public class Labels extends ListResourceBundle{
                 {"tlAssignedQuizzes","Assigned Quizzes"},
                 {"msSelectTheQuiz","Select the Quiz"},
                 {"msCheckValue4"," cannot be empty or exceed "},
+                {"msQuizIsCompleted","Quiz is completed!"},
+                {"msSelectTheResponse","Select the Response"},
 
                 //QuizEditingClient
                 {"tlQuizEditing","Quiz Editing"},
@@ -90,6 +92,7 @@ public class Labels extends ListResourceBundle{
                 //QuizTakingClient
                 {"btNext","Next"},
                 {"btFinish","Finish"},
+                {"btPrevious","Previous"},
                 {"tlAllQuestions","All questions"},
                 {"tlQuizTaking","Quiz Taking"},
         };
