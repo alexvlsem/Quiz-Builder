@@ -17,7 +17,6 @@ public class QuestionEditingClient extends JDialog {
     private ResourceBundle rb = LoginClient.rb;
     private QuestionEditingGUI questionEditingGUI;
     private Question question;
-    private Container container;
 
     public QuestionEditingClient(QuizEditingClient dialog, Question question) {
 
@@ -27,7 +26,7 @@ public class QuestionEditingClient extends JDialog {
 
         questionEditingGUI = new QuestionEditingGUI();
 
-        container = getContentPane();
+        Container container = getContentPane();
         container.setLayout(new BorderLayout());
 
         container.add(questionEditingGUI, BorderLayout.CENTER);
@@ -43,6 +42,9 @@ public class QuestionEditingClient extends JDialog {
         validate();
     }
 
+    /**
+     * The inner QuestionEditingGUI class creates a panel for editing a question.
+     */
     private class QuestionEditingGUI extends JPanel {
 
         JTextField questionName;
@@ -135,12 +137,15 @@ public class QuestionEditingClient extends JDialog {
 
             dm.setDataVector(DataBaseConnector.getAnswers(question), headings);
             formatTable();
-            if (currRow >= 0) {
+            if (currRow >= 0 && currRow < table.getRowCount()) {
                 table.setRowSelectionInterval(currRow, currRow);
             }
         }
     }
 
+    /**
+     * The inner QuestionHandler class handles all events of the  QuestionEditingClient instance.
+     */
     private class QuestionHandler implements ActionListener {
 
         @Override
@@ -155,13 +160,12 @@ public class QuestionEditingClient extends JDialog {
                 questionEditingGUI.refreshAnswers();
             } else if (e.getSource() == questionEditingGUI.buttonEditAnswer) {
 
-                JTable table = questionEditingGUI.table;
+                Object answer = ApplicationClient.getTableValue(questionEditingGUI.table, 1);
 
-                int rowInd = table.getSelectedRow();
-                if (rowInd < 0) {
+                if (answer == null) {
                     JOptionPane.showMessageDialog(QuestionEditingClient.this, rb.getString("msSelectTheRow"));
                 } else {
-                    new AnswerEditingClient(QuestionEditingClient.this, (Answer) table.getValueAt(rowInd, 1));
+                    new AnswerEditingClient(QuestionEditingClient.this, (Answer) answer);
                     questionEditingGUI.refreshAnswers();
                 }
 
@@ -175,6 +179,18 @@ public class QuestionEditingClient extends JDialog {
                     question.setText(questionText);
                     question.setMultipleChoice(questionEditingGUI.multipleChoice.isSelected());
                     DataBaseConnector.saveQuestion(question);
+                }
+            } else if (e.getSource() == questionEditingGUI.buttonDeleteAnswer) {
+                Object answer = ApplicationClient.getTableValue(questionEditingGUI.table, 1);
+
+                if (answer == null) {
+                    JOptionPane.showMessageDialog(QuestionEditingClient.this, rb.getString("msSelectTheRow"));
+                } else {
+                    if (!DataBaseConnector.deleteReference((Answer) answer)) {
+                        JOptionPane.showMessageDialog(QuestionEditingClient.this, rb.getString("msAnswerCantBeRemoved"));
+                    } else {
+                        questionEditingGUI.refreshAnswers();
+                    }
                 }
             }
         }

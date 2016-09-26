@@ -3,38 +3,31 @@
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class Quiz {
+public class Quiz extends Reference {
 
-    private int id;
     private String name;
     private QuizTypes type;
     private User owner;
 
     Quiz(int id, String name, QuizTypes type, User owner) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
+        super(id);
+        setName(name);
+        setType(type);
         this.owner = owner;
     }
 
+    //Setters
     public String getName() {
         return name;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    //Getters
+    public User getOwner() {
+        return owner;
     }
 
     public QuizTypes getType() {

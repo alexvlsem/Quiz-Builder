@@ -136,7 +136,7 @@ public class QuizEditingClient extends JDialog {
 
             dm.setDataVector(DataBaseConnector.getQuestions(quiz), headings);
             formatTable();
-            if (currRow >= 0) {
+            if (currRow >= 0 && currRow < table.getRowCount()) {
                 table.setRowSelectionInterval(currRow, currRow);
             }
         }
@@ -157,17 +157,14 @@ public class QuizEditingClient extends JDialog {
                 new QuestionEditingClient(QuizEditingClient.this, new Question(0, null, null, true, quiz));
                 quizEditingGUI.refreshQuestions();
             } else if (e.getSource() == quizEditingGUI.buttonEditQuestion) {
+                Object question = ApplicationClient.getTableValue(quizEditingGUI.table, 1);
 
-                JTable table = quizEditingGUI.table;
-
-                int rowInd = table.getSelectedRow();
-                if (rowInd < 0) {
+                if (question == null) {
                     JOptionPane.showMessageDialog(QuizEditingClient.this, rb.getString("msSelectTheQuestion"));
                 } else {
-                    new QuestionEditingClient(QuizEditingClient.this, (Question) table.getValueAt(rowInd, 1));
+                    new QuestionEditingClient(QuizEditingClient.this, (Question) question);
                     quizEditingGUI.refreshQuestions();
                 }
-
             } else if (e.getSource() == quizEditingGUI.buttonSaveQuiz) {
 
                 String quizName = quizEditingGUI.quizName.getText();
@@ -175,6 +172,18 @@ public class QuizEditingClient extends JDialog {
                     quiz.setName(quizName);
                     quiz.setType((QuizTypes) quizEditingGUI.quizTypes.getSelectedItem());
                     DataBaseConnector.saveQuiz(quiz);
+                }
+            } else if (e.getSource() == quizEditingGUI.buttonDeleteQuestion) {
+                Object question = ApplicationClient.getTableValue(quizEditingGUI.table, 1);
+
+                if (question == null) {
+                    JOptionPane.showMessageDialog(QuizEditingClient.this, rb.getString("msSelectTheQuestion"));
+                } else {
+                    if (!DataBaseConnector.deleteReference((Question) question)) {
+                        JOptionPane.showMessageDialog(QuizEditingClient.this, rb.getString("msQuestionCantBeRemoved"));
+                    } else {
+                        quizEditingGUI.refreshQuestions();
+                    }
                 }
             }
         }

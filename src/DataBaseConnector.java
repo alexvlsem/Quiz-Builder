@@ -1,4 +1,3 @@
-
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -28,10 +27,18 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The connectionStatus method returns the connection status.
+     *
+     * @return the connection status
+     */
     public static boolean connectionStatus() {
         return conn != null;
     }
 
+    /**
+     * The closeConnection method closes the connection.
+     */
     public static void closeConnection() {
         if (conn != null) {
             try {
@@ -44,9 +51,15 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The prepareDatabase method calls the list of methods
+     * to create new tables in the database.
+     *
+     * @throws SQLException
+     */
     private static void prepareDatabase() throws SQLException {
 
-        try (Statement stmt = conn.createStatement()) { //
+        try (Statement stmt = conn.createStatement()) {
             DatabaseMetaData dbmd = conn.getMetaData();
 
             createUsersTable(dbmd, stmt);
@@ -58,6 +71,9 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The createUsersTable method creates a table to store records about users.
+     */
     private static void createUsersTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Users", null);
@@ -73,6 +89,9 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The createQuizzesTable method creates a table to store records about quizzes.
+     */
     private static void createQuizzesTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Quizzes", null);
@@ -87,6 +106,9 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The createQuestionsTable method creates a table to store records about questions.
+     */
     private static void createQuestionsTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Questions", null);
@@ -102,6 +124,9 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The createAnswersTable method creates a table to store records about answers.
+     */
     private static void createAnswersTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Answers", null);
@@ -116,6 +141,10 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The createAssignedQuizzesTable method creates a table to store records about
+     * assigned to users quizzes and completed by users quizzes.
+     */
     private static void createAssignedQuizzesTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "AssignedQuizzes", null);
@@ -132,6 +161,10 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The createQuizResponsesTable method creates a table to store records about
+     * the users' answers.
+     */
     private static void createQuizResponsesTable(
             DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "QuizResponses", null);
@@ -147,6 +180,9 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The getUserRecord gets a record about the user.
+     */
     public static ArrayList<String> getUserRecord(String[] prm) {
 
         ArrayList<String> userData = new ArrayList<>();
@@ -161,7 +197,7 @@ public class DataBaseConnector {
                 userData.add(rs.getString(1));
                 userData.add(rs.getString(2));
             } else {
-                userData.add("User is not found.");
+                userData.add(LoginClient.rb.getString("msUserIsNotFound"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -169,6 +205,9 @@ public class DataBaseConnector {
         return userData;
     }
 
+    /**
+     * The createUser method inserts a record about the user.
+     */
     public static ArrayList<String> createUser(String[] prm) {
 
         ArrayList<String> userData = new ArrayList<>();
@@ -177,7 +216,7 @@ public class DataBaseConnector {
             ResultSet rs = stmt.executeQuery(
                     "SELECT firstName, lastName FROM Users WHERE login='" + prm[0] + "'");
             if (rs.next()) {
-                userData.add("The login has already been used,\ntry to enter another one.");
+                userData.add(LoginClient.rb.getString("msLoginIsBeenUsed"));
             } else {
                 stmt.executeUpdate("INSERT INTO Users (login, firstName, lastName, password) " +
                         "VALUES ( '" + prm[0] + "', '" + prm[1] + "', '" + prm[2] + "', '" + prm[3] + "')");
@@ -188,6 +227,12 @@ public class DataBaseConnector {
         return userData;
     }
 
+    /**
+     * The saveQuiz method inserts a new record or updates an existing record
+     * about the particular quiz.
+     *
+     * @param quiz the instance of the Quiz class.
+     */
     public static void saveQuiz(Quiz quiz) {
 
         if (quiz.getId() == 0) {
@@ -221,6 +266,13 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The getQuizzes method returns user's quizzes.
+     *
+     * @param user instance of the User class.
+     * @return a two dimensional vector;
+     * each row contains: a number of the row, a Quiz instance, a quiz type.
+     */
     public static Vector getQuizzes(User user) {
 
         Vector rows = new Vector();
@@ -250,6 +302,12 @@ public class DataBaseConnector {
         return rows;
     }
 
+    /**
+     * The saveQuestion method inserts a new record or updates an existing record
+     * about the particular question.
+     *
+     * @param question the instance of the Question class.
+     */
     public static void saveQuestion(Question question) {
 
         if (question.getId() == 0) {
@@ -285,6 +343,14 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The getQuestions method returns questions of the quiz.
+     *
+     * @param quiz the instance of the Quiz class.
+     * @return a two dimensional vector;
+     * each row contains: a number of the row, a Question instance,
+     * a text of the question, an attribute of multiple choice of the question.
+     */
     public static Vector getQuestions(Quiz quiz) {
 
         Vector rows = new Vector();
@@ -313,6 +379,12 @@ public class DataBaseConnector {
         return rows;
     }
 
+    /**
+     * The saveAnswer method inserts a new record or updates an existing record
+     * about the particular answer.
+     *
+     * @param answer the instance of the Answer class.
+     */
     public static void saveAnswer(Answer answer) {
 
         if (answer.getId() == 0) {
@@ -346,6 +418,14 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The getAnswers method returns answers of the question.
+     *
+     * @param question the instance of the Question class
+     * @return a two dimensional vector;
+     * each row contains: a number of the row, an Answer instance,
+     * an attribute of correctness of the answer.
+     */
     public static Vector getAnswers(Question question) {
 
         Vector rows = new Vector();
@@ -373,6 +453,14 @@ public class DataBaseConnector {
         return rows;
     }
 
+    /**
+     * The getUsersForAssignment method creates list of users which are assigned
+     * or not to particular quiz depending on the inclusive parameter.
+     *
+     * @param quiz      the instance of the Quiz class.
+     * @param inclusive are users assigned or not to the quiz.
+     * @return the list of users
+     */
     public static ArrayList<User> getUsersForAssignment(Quiz quiz, boolean inclusive) {
 
         ArrayList<User> users = new ArrayList<>();
@@ -404,6 +492,12 @@ public class DataBaseConnector {
         return users;
     }
 
+    /**
+     * The assignQuizToUsers method inserts records about the assigned quiz to the users.
+     *
+     * @param users list of users.
+     * @param quiz  the instance of the Quiz class.
+     */
     public static void assignQuizToUsers(ArrayList<User> users, Quiz quiz) {
 
         String query = "INSERT INTO AssignedQuizzes (userId, quizId, assignDate, quizCompleted, resultViewed ) " +
@@ -425,6 +519,12 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The removeQuizFromUsers method deletes records about the assigned quiz to the users.
+     *
+     * @param users list of users.
+     * @param quiz  the instance of the Quiz class.
+     */
     public static void removeQuizFromUsers(ArrayList<User> users, Quiz quiz) {
 
         String query = "DELETE FROM AssignedQuizzes WHERE userId =? AND quizId =? AND quizCompleted=?";
@@ -443,6 +543,14 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The getAssignedQuizzes returns quizzes assigned to the user.
+     *
+     * @param user the current user of the program.
+     * @return a two dimensional vector;
+     * each row contains: a number of the row, a date of assignment, a Quiz instance,
+     * an User instance (author), a quiz type.
+     */
     public static Vector getAssignedQuizzes(User user) {
 
         Vector rows = new Vector();
@@ -486,6 +594,12 @@ public class DataBaseConnector {
         return rows;
     }
 
+    /**
+     * The saveResponses method saves responses during taking a quiz.
+     *
+     * @param rows       a two dimensional vector with the selected answers.
+     * @param respondent the user who is taking a quiz.
+     */
     public static void saveResponses(Vector rows, User respondent) {
 
         String queryDel = "DELETE FROM QuizResponses WHERE respondentId=? AND answerId=?";
@@ -522,6 +636,15 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The getMarkedAnswers method returns selected answers during taking a quiz.
+     *
+     * @param respondent the user who is taking a quiz.
+     * @param question   the instance of the Question class.
+     * @return a two dimensional vector;
+     * each row contains: a number of the row, an Answer instance,
+     * selection of the answer.
+     */
     public static Vector getMarkedAnswers(User respondent, Question question) {
 
         Vector rows = new Vector();
@@ -565,6 +688,12 @@ public class DataBaseConnector {
         return rows;
     }
 
+    /**
+     * The finishQuiz method updates the record about an assigned quiz making the quz completed.
+     *
+     * @param respondent the user who is taking a quiz.
+     * @param quiz       the instance of the Quiz class.
+     */
     public static void finishQuiz(User respondent, Quiz quiz) {
         String query = "UPDATE AssignedQuizzes \n" +
                 "SET AssignedQuizzes.completeDate=?, AssignedQuizzes.quizCompleted=? \n" +
@@ -582,6 +711,14 @@ public class DataBaseConnector {
         }
     }
 
+    /**
+     * The method getCompletedQuizzes returns completed quizzes.
+     *
+     * @param user the owner of quizzes; the current user.
+     * @return a two dimensional vector;
+     * each row contains: a date of completion, an User instance (respondent),
+     * a Quiz instance, a type of quiz, the viewing of results.
+     */
     public static Vector getCompletedQuizzes(User user) {
 
         Vector rows = new Vector();
@@ -590,6 +727,7 @@ public class DataBaseConnector {
                 "  AssignedQuizzes.userId,\n" +
                 "  AssignedQuizzes.quizId,\n" +
                 "  AssignedQuizzes.completeDate,\n" +
+                "  AssignedQuizzes.resultViewed,\n" +
                 "  Quizzes.name AS quizName,\n" +
                 "  Quizzes.type AS quizType,\n" +
                 "  Users.firstName,\n" +
@@ -616,6 +754,7 @@ public class DataBaseConnector {
                 row.add(respondent);
                 row.add(quiz);
                 row.add(quiz.getType());
+                row.add(rs.getBoolean("resultViewed"));
                 rows.add(row);
             }
         } catch (SQLException e) {
@@ -624,6 +763,15 @@ public class DataBaseConnector {
         return rows;
     }
 
+    /**
+     * The getQuizResults method gets results of the quiz.
+     *
+     * @param respondent the user which results are received.
+     * @param quiz       the Quiz instance.
+     * @return a two dimensional vector;
+     * each row contains: a Question instance,
+     * an Answer instance, selection of the answer.
+     */
     static Vector getQuizResults(User respondent, Quiz quiz) {
         Vector rows = new Vector();
 
@@ -666,9 +814,9 @@ public class DataBaseConnector {
 
             while (rs.next()) {
 
-                if (currQuestion == null || currQuestion.getId() != rs.getInt("questionId")){
-                currQuestion = new Question(rs.getInt("questionId"), rs.getString("questionName"),
-                        rs.getString("questionText"), rs.getBoolean("multipleChoice"), quiz);
+                if (currQuestion == null || currQuestion.getId() != rs.getInt("questionId")) {
+                    currQuestion = new Question(rs.getInt("questionId"), rs.getString("questionName"),
+                            rs.getString("questionText"), rs.getBoolean("multipleChoice"), quiz);
                 }
                 Answer currAnswer = new Answer(rs.getInt("answerId"), rs.getString("answerText"),
                         rs.getBoolean("correctAnswer"), currQuestion);
@@ -682,8 +830,52 @@ public class DataBaseConnector {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         return rows;
+    }
+
+    /**
+     * The deleteReference deletes a record from the database.
+     *
+     * @param reference the instance of the Reference class.
+     * @return the result of deletion.
+     */
+    public static boolean deleteReference(Reference reference) {
+
+        String tableName = "";
+        if (reference instanceof Quiz) {
+            tableName = "Quizzes";
+        } else if (reference instanceof Question) {
+            tableName = "Questions";
+        } else if (reference instanceof Answer) {
+            tableName = "Answers";
+        }
+
+        String query = "DELETE FROM  " + tableName + " WHERE id = ?";
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            pstm.setInt(1, reference.getId());
+            pstm.execute();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
+     * The makeResponseViewed method makes the result of the quiz viewed.
+     *
+     * @param respondent the instance of User class.
+     * @param quiz       the instance of Quiz class.
+     */
+    public static void makeResponseViewed(User respondent, Quiz quiz) {
+
+        String query = "UPDATE AssignedQuizzes SET resultViewed =? WHERE userId=? AND quizId=?";
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            pstm.setBoolean(1, true);
+            pstm.setString(2, respondent.getLogin());
+            pstm.setInt(3, quiz.getId());
+            pstm.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

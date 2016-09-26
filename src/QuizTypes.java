@@ -1,4 +1,6 @@
 /**
+ * The QuizTypes enum represents types of the quiz.
+ *
  * @author Aleksei_Semenov 2016-09-07.
  */
 public enum QuizTypes {

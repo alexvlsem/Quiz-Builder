@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -110,11 +109,11 @@ public class QuizTakingClient extends JDialog {
 
             ButtonGroup group = new ButtonGroup();
 
-            Vector rows = DataBaseConnector.getMarkedAnswers(respondent,question);
+            Vector rows = DataBaseConnector.getMarkedAnswers(respondent, question);
             for (int i = 0; i < rows.size(); i++) {
                 Vector currRow = (Vector) rows.get(i);
 
-                Answer currAnswer =  (Answer) currRow.get(1);
+                Answer currAnswer = (Answer) currRow.get(1);
                 boolean isSelected = (boolean) currRow.get(2);
 
                 c.gridx = 0;
@@ -132,7 +131,7 @@ public class QuizTakingClient extends JDialog {
 
                 JTextField number = new JTextField();
                 number.setEditable(false);
-                number.setText(""+currRow.get(0));
+                number.setText("" + currRow.get(0));
                 c.gridx = 1;
                 c.gridy = i;
                 panel.add(number, c);
@@ -153,6 +152,9 @@ public class QuizTakingClient extends JDialog {
         }
     }
 
+    /**
+     * The inner QuizTakingHandler class handles all events of the QuizTakingClient class.
+     */
     private class QuizTakingHandler implements ActionListener, ListSelectionListener {
 
         @Override
@@ -187,12 +189,12 @@ public class QuizTakingClient extends JDialog {
                         isSelected = currButton.isSelected();
                     }
                     Vector row = (Vector) quizTakingGUI.answerList.get(i / 3);
-                    row.set(0,isSelected);
+                    row.set(0, isSelected);
                 }
-                DataBaseConnector.saveResponses(quizTakingGUI.answerList,respondent);
+                DataBaseConnector.saveResponses(quizTakingGUI.answerList, respondent);
 
             } else if (e.getSource().equals(quizTakingGUI.buttonFinishQuiz)) {
-                DataBaseConnector.finishQuiz(respondent,quiz);
+                DataBaseConnector.finishQuiz(respondent, quiz);
                 QuizTakingClient.this.dispose();
             }
         }
@@ -214,18 +216,17 @@ public class QuizTakingClient extends JDialog {
                 quizTakingGUI.scrollPaneAnswers.setViewportView(quizTakingGUI.answerPanel);
 
                 //move scroll bars to the top and left.
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        quizTakingGUI.scrollPaneAnswers.getVerticalScrollBar().setValue(0);
-                        quizTakingGUI.scrollPaneAnswers.getHorizontalScrollBar().setValue(0);
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    quizTakingGUI.scrollPaneAnswers.getVerticalScrollBar().setValue(0);
+                    quizTakingGUI.scrollPaneAnswers.getHorizontalScrollBar().setValue(0);
                 });
-
             }
         }
     }
 
+    /**
+     * The QuizTakingClient constructor.
+     */
     public QuizTakingClient(ApplicationClient frame, Quiz quiz, User respondent) {
         super(frame, true);
         this.quiz = quiz;

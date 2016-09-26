@@ -3,24 +3,20 @@
  *
  * @author Aleksei_Semenov 10/08/16.
  */
-public class Answer {
+public class Answer extends Reference {
 
-    private int id;
     private String text;
     private boolean correctness;
     private Question question;
 
     public Answer(int id, String text, boolean correctness, Question question) {
-        this.id = id;
-        this.text = text;
-        this.correctness = correctness;
-        this.question = question;
+        super(id);
+        setText(text);
+        setCorrectness(correctness);
+        setQuestion(question);
     }
 
-    public int getId() {
-        return id;
-    }
-
+    //Setters
     public String getText() {
         return text;
     }
@@ -33,10 +29,7 @@ public class Answer {
         return correctness;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    //Getters
     public void setText(String text) {
         this.text = text;
     }

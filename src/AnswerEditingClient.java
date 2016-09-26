@@ -16,6 +16,9 @@ public class AnswerEditingClient extends JDialog {
     private AnswerEditingGUI answerEditingGUI;
     private Answer answer;
 
+    /**
+     * The inner AnswerEditingGUI class creates panel for editing the answer
+     */
     private class AnswerEditingGUI extends JPanel {
 
         JTextArea answerText;
@@ -46,6 +49,12 @@ public class AnswerEditingClient extends JDialog {
         }
     }
 
+    /**
+     * The AnswerEditingClient constructor.
+     *
+     * @param dialog
+     * @param answer
+     */
     public AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
         super(dialog, true);
 
@@ -70,6 +79,9 @@ public class AnswerEditingClient extends JDialog {
         validate();
     }
 
+    /**
+     * The AnswerHandler class saves the answer
+     */
     private class AnswerHandler implements ActionListener {
 
         @Override

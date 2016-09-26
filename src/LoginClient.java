@@ -70,11 +70,6 @@ public class LoginClient extends JFrame {
 
             login = new JTextField(15);
             password = new JPasswordField();
-
-            //Only for testing
-            //login.setText("al");
-            //password.setText("123");
-
             buttonSignIn = new JButton(rb.getString("btSignIn"));
 
             setLayout(new GridBagLayout());
@@ -110,7 +105,6 @@ public class LoginClient extends JFrame {
             c.gridx = 1;
             c.gridy = 3;
             add(buttonSignIn, c);
-
         }
     }
 
@@ -331,7 +325,7 @@ public class LoginClient extends JFrame {
                         InterfaceLanguages) loginPanelGUI.settingsPanel.boxLanguage.getSelectedItem());
                 try {
                     ObjectOutputStream os = new ObjectOutputStream(
-                            new FileOutputStream(new File(LoginClient.class.getResource("").getFile(),"settings.txt")));
+                            new FileOutputStream(new File(LoginClient.class.getResource("").getFile(), "settings.txt")));
                     os.writeObject(settings);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
@@ -383,7 +377,6 @@ public class LoginClient extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         validate();
-
     }
 
     /**
@@ -448,12 +441,11 @@ public class LoginClient extends JFrame {
         loadSettings();
 
         LoginClient lc = new LoginClient();
-
-        //Only for testing
-        //lc.loginPanelGUI.loginPanel.buttonSignIn.doClick();
     }
 
-    /** Returns an ImageIcon, or null if the path was invalid. */
+    /**
+     * Returns an ImageIcon, or null if the path was invalid.
+     */
     protected static ImageIcon createImageIcon(String path) {
         java.net.URL imgURL = LoginClient.class.getResource(path);
         if (imgURL != null) {

@@ -26,6 +26,7 @@ public class ApplicationClient extends JFrame {
 
         applicationGUI = new ApplicationGUI();
         applicationGUI.assignedQuizPanel.refreshInfo();
+        applicationGUI.responsesPanel.refreshInfo();
 
         Container container = getContentPane();
         container.setLayout(new BorderLayout());
@@ -92,6 +93,10 @@ public class ApplicationClient extends JFrame {
         }
     }
 
+    /**
+     * The inner YourQuizPanel class crates user's quiz panel;
+     * allows creating, editing and deleting of the quizzes.
+     */
     private class YourQuizPanel extends JPanel {
 
         JButton buttonNewQuiz, buttonEditQuiz, buttonDeleteQuiz,
@@ -102,6 +107,9 @@ public class ApplicationClient extends JFrame {
         DefaultTableModel dm;
         Vector<String> headings = new Vector<>();
 
+        /**
+         * The YourQuizPanel constructor
+         */
         YourQuizPanel() {
 
             headings.addElement(rb.getString("tlNumber"));
@@ -180,7 +188,7 @@ public class ApplicationClient extends JFrame {
 
             formatTable();
 
-            if (currRow >= 0) {
+            if (currRow >= 0 && currRow < table.getRowCount()) {
                 table.setRowSelectionInterval(currRow, currRow);
             }
         }
@@ -206,6 +214,9 @@ public class ApplicationClient extends JFrame {
         }
     }
 
+    /**
+     * The inner ResponsesPanel class creates panel with responses.
+     */
     private class ResponsesPanel extends JPanel {
 
         JTable table;
@@ -220,6 +231,7 @@ public class ApplicationClient extends JFrame {
             headings.addElement(rb.getString("tlRespondent"));
             headings.addElement(rb.getString("tlQuizName"));
             headings.addElement(rb.getString("tlType"));
+            headings.addElement(rb.getString("tlViewed"));
 
             //Creates new table and adds it to the scroll pane
             dm = new DefaultTableModel(DataBaseConnector.getCompletedQuizzes(user), headings);
@@ -250,8 +262,8 @@ public class ApplicationClient extends JFrame {
             dm.setDataVector(DataBaseConnector.getCompletedQuizzes(user), headings);
 
             formatTable();
-
-            if (currRow >= 0) {
+            refreshInfo();
+            if (currRow >= 0 && currRow < table.getRowCount()) {
                 table.setRowSelectionInterval(currRow, currRow);
             }
         }
@@ -266,8 +278,29 @@ public class ApplicationClient extends JFrame {
                 table.setDefaultEditor(col_class, null);        // remove editor
             }
         }
+
+        void refreshInfo() {
+            int newResponses = 0;
+
+            for (int i = 0; i < table.getRowCount(); i++) {
+                if (!(boolean) table.getValueAt(i, 4)) {
+                    newResponses++;
+                }
+            }
+
+            String info = rb.getString("msInfo5");
+            if (newResponses > 0) {
+                info = rb.getString("msInfo2") + newResponses + rb.getString("msInfo6")
+                        + (newResponses > 1 ? rb.getString("msInfo7") : "");
+            }
+            applicationGUI.mainPanel.textNewResponses.setText(info);
+        }
     }
 
+    /**
+     * The inner AssignedQuizPanel class creates panel
+     * with the quizzes assigned to the user by other users.
+     */
     private class AssignedQuizPanel extends JPanel {
 
         JTable table;
@@ -324,7 +357,7 @@ public class ApplicationClient extends JFrame {
 
             formatTable();
             refreshInfo();
-            if (currRow >= 0) {
+            if (currRow >= 0 && currRow < table.getRowCount()) {
                 table.setRowSelectionInterval(currRow, currRow);
             }
         }
@@ -347,6 +380,9 @@ public class ApplicationClient extends JFrame {
         }
     }
 
+    /**
+     * The inner ApplicationGUI class creates the main interface of the program.
+     */
     private class ApplicationGUI extends JPanel {
 
         MainPanel mainPanel;
@@ -386,9 +422,6 @@ public class ApplicationClient extends JFrame {
             tabbedPane.add(rb.getString("tlResponses"), responsesPanel);
             tabbedPane.add(rb.getString("tlAssignedQuizzes"), assignedQuizPanel);
 
-            //Only for testing
-            //tabbedPane.setSelectedIndex(2);
-
             JPanel actionWrapper = new JPanel();
             actionWrapper.add(profileAction);
 
@@ -398,6 +431,9 @@ public class ApplicationClient extends JFrame {
         }
     }
 
+    /**
+     * The inner ApplicationHandler class handles all events of the ApplicationClient instance.
+     */
     private class ApplicationHandler extends WindowAdapter implements ActionListener, ItemListener, ListSelectionListener {
 
         @Override
@@ -416,6 +452,12 @@ public class ApplicationClient extends JFrame {
                     return;
                 }
                 new ReportClient(ApplicationClient.this, (User) currRespondent, (Quiz) currQuiz);
+
+                if (!(boolean) getTableValue(applicationGUI.responsesPanel.table, 4)) {
+                    DataBaseConnector.makeResponseViewed((User) currRespondent, (Quiz) currQuiz);
+                    applicationGUI.responsesPanel.refreshTable();
+                }
+
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonNewQuiz) {
                 new QuizEditingClient(ApplicationClient.this, new Quiz(0, null, null, user));
                 applicationGUI.yourQuizPanel.refreshQuizTable();
@@ -428,6 +470,19 @@ public class ApplicationClient extends JFrame {
                 }
                 new QuizEditingClient(ApplicationClient.this, (Quiz) currQuiz);
                 applicationGUI.yourQuizPanel.refreshQuizTable();
+
+            } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonDeleteQuiz) {
+                Object currQuiz = getTableValue(applicationGUI.yourQuizPanel.table, 1);
+                if (currQuiz == null) {
+                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheQuiz"));
+                    return;
+                } else {
+                    if (!DataBaseConnector.deleteReference((Quiz) currQuiz)) {
+                        JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msQuizCantBeRemoved"));
+                    } else {
+                        applicationGUI.yourQuizPanel.refreshQuizTable();
+                    }
+                }
 
             } else if (e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz) {
 
@@ -488,19 +543,34 @@ public class ApplicationClient extends JFrame {
         }
     }
 
-    public static boolean fieldIsCorrect(String s, int maxLength, String fieldName) {
+    /**
+     * The fieldIsCorrect method checks that the value is not empty abd does't exceed max length.
+     *
+     * @param string    the checked value.
+     * @param maxLength max length of the checked value.
+     * @param fieldName the name of the field name of the checked value.
+     * @return result of checking
+     */
+    public static boolean fieldIsCorrect(String string, int maxLength, String fieldName) {
 
-        s = s.trim();
-        if (s.length() > 0 && s.length() <= maxLength) {
+        string = string.trim();
+        if (string.length() > 0 && string.length() <= maxLength) {
             return true;
         } else {
             JOptionPane.showMessageDialog(null, fieldName + rb.getString("msCheckValue4")
                             + maxLength + rb.getString("msCheckValue2"), rb.getString("msCheckValue3"),
                     JOptionPane.ERROR_MESSAGE);
+            return false;
         }
-        return false;
     }
 
+    /**
+     * The getTableValue method gets a value from the table.
+     *
+     * @param table  the table from which value is gotten.
+     * @param column the number of column.
+     * @return the gotten value or null.
+     */
     public static Object getTableValue(JTable table, int column) {
 
         Object returnedValue = null;

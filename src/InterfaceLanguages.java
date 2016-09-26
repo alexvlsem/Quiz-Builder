@@ -1,6 +1,9 @@
 import java.io.Serializable;
 
 /**
+ * The InterfaceLanguages enum represents interface languages of the program.
+ * Can be expanded as much as needed.
+ *
  * @author Aleksei_Semenov 2016-09-19.
  */
 public enum InterfaceLanguages implements Serializable {
@@ -21,6 +24,7 @@ public enum InterfaceLanguages implements Serializable {
         return name;
     }
 
+    //Getters for creating locales
     public String getLanguage() {
         return language;
     }

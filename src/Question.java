@@ -3,22 +3,22 @@
  *
  * @author Aleksei_Semenov 10/08/16.
  */
-public class Question {
+public class Question extends Reference {
 
-    private int id;
     private String name;
     private String text;
     private boolean multipleChoice;
     private Quiz quiz;
 
     public Question(int id, String name, String text, boolean multipleChoice, Quiz quiz) {
-        this.id = id;
-        this.name = name;
-        this.text = text;
-        this.multipleChoice = multipleChoice;
-        this.quiz = quiz;
+        super(id);
+        setName(name);
+        setText(text);
+        setMultipleChoice(multipleChoice);
+        setQuiz(quiz);
     }
 
+    //Getters
     public String getText() {
         return text;
     }
@@ -31,6 +31,11 @@ public class Question {
         return quiz;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    //Setters
     public void setText(String text) {
         this.text = text;
     }
@@ -41,18 +46,6 @@ public class Question {
 
     public void setQuiz(Quiz quiz) {
         this.quiz = quiz;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setName(String name) {

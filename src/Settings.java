@@ -1,6 +1,8 @@
 import java.io.Serializable;
 
 /**
+ * The Settings class represents settings of the program.
+ *
  * @author Aleksei_Semenov 2016-09-18.
  */
 public class Settings implements Serializable {
@@ -12,12 +14,9 @@ public class Settings implements Serializable {
     private char[] password;
     private InterfaceLanguages localization;
 
+    //Getters
     public InterfaceLanguages getLocalization() {
         return localization;
-    }
-
-    public void setLocalization(InterfaceLanguages localization) {
-        this.localization = localization;
     }
 
     public String getServer() {
@@ -34,6 +33,11 @@ public class Settings implements Serializable {
 
     public char[] getPassword() {
         return password;
+    }
+
+    //Setters
+    public void setLocalization(InterfaceLanguages localization) {
+        this.localization = localization;
     }
 
     public void setServer(String server) {
