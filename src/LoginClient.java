@@ -419,7 +419,8 @@ public class LoginClient extends JFrame {
 
         Locale locale = new Locale("en");
         if (settings != null) {
-            locale = new Locale(settings.getLocalization().getLanguage(), settings.getLocalization().getCountry());
+            locale = new Locale(settings.getLocalization().getLanguage(),
+                    settings.getLocalization().getCountry());
         }
         rb = ResourceBundle.getBundle("Localization.Labels", locale);
     }
