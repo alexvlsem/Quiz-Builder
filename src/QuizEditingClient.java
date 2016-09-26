@@ -14,22 +14,20 @@ import java.util.Vector;
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class QuizEditingClient extends JDialog {
+class QuizEditingClient extends JDialog {
 
     private ResourceBundle rb = LoginClient.rb;
     private QuizEditingGUI quizEditingGUI;
     private Quiz quiz;
-    private Container container;
 
-    public QuizEditingClient(ApplicationClient applicationClient, Quiz quiz) {
+    QuizEditingClient(ApplicationClient applicationClient, Quiz quiz) {
 
         super(applicationClient, true);
-
         this.quiz = quiz;
 
         quizEditingGUI = new QuizEditingGUI();
 
-        container = getContentPane();
+        Container container = getContentPane();
         container.setLayout(new BorderLayout());
         container.add(quizEditingGUI, BorderLayout.CENTER);
 
@@ -49,7 +47,7 @@ public class QuizEditingClient extends JDialog {
     private class QuizEditingGUI extends JPanel {
 
         JTextField quizName;
-        JComboBox quizTypes;
+        JComboBox<QuizTypes> quizTypes;
         JButton buttonSaveQuiz, buttonNewQuestion,
                 buttonEditQuestion, buttonDeleteQuestion;
         Vector<String> headings = new Vector<>();
@@ -60,7 +58,7 @@ public class QuizEditingClient extends JDialog {
 
             quizName = new JTextField(30);
             quizName.setBorder(BorderFactory.createTitledBorder(rb.getString("tlQuizName")));
-            quizTypes = new JComboBox(QuizTypes.values());
+            quizTypes = new JComboBox<>(QuizTypes.values());
             quizTypes.setBorder(BorderFactory.createTitledBorder(rb.getString("tlType")));
 
             if (quiz.getName() != null) {

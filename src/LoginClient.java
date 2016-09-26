@@ -20,8 +20,8 @@ import javax.swing.*;
  */
 public class LoginClient extends JFrame {
 
-    public static Settings settings;
-    public static ResourceBundle rb;
+    static Settings settings;
+    static ResourceBundle rb;
 
     private LoginPanelGUI loginPanelGUI;
     private JTabbedPane tabbedPane;
@@ -185,7 +185,7 @@ public class LoginClient extends JFrame {
             password = new JPasswordField();
             buttonSave = new JButton(rb.getString("btSave"));
             buttonTestConnection = new JButton(rb.getString("btTest"));
-            boxLanguage = new JComboBox(InterfaceLanguages.values());
+            boxLanguage = new JComboBox<>(InterfaceLanguages.values());
 
             if (settings != null) {
                 server.setText(settings.getServer());
@@ -382,14 +382,14 @@ public class LoginClient extends JFrame {
     /**
      * The checkValue method checks values of the forms.
      *
-     * @param s         The entered value
-     * @param maxLength The max length of the value
-     * @param fieldName The name of the entered value
-     * @return boolean
+     * @param s         the entered value
+     * @param maxLength the max length of the value
+     * @param fieldName the name of the entered value
+     * @return boolean the result.
      */
-    public static boolean checkValue(String s, int maxLength, String fieldName) {
+    private static boolean checkValue(String s, int maxLength, String fieldName) {
 
-        Pattern pattern = Pattern.compile("[a-zA-Zа-яА-Я\\d_]{1," + maxLength + "}");
+        Pattern pattern = Pattern.compile(String.format("[a-zA-Zа-яА-Я\\d_]{1,%d}", maxLength));
         Matcher matcher = pattern.matcher(s);
         if (matcher.find() && matcher.group().equals(s)) {
             return true;
@@ -440,13 +440,13 @@ public class LoginClient extends JFrame {
 
         loadSettings();
 
-        LoginClient lc = new LoginClient();
+        new LoginClient();
     }
 
     /**
      * Returns an ImageIcon, or null if the path was invalid.
      */
-    protected static ImageIcon createImageIcon(String path) {
+    static ImageIcon createImageIcon(String path) {
         java.net.URL imgURL = LoginClient.class.getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);

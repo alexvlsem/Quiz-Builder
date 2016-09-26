@@ -5,7 +5,7 @@ import java.io.Serializable;
  *
  * @author Aleksei_Semenov 2016-09-18.
  */
-public class Settings implements Serializable {
+class Settings implements Serializable {
 
     private String
             server,
@@ -15,44 +15,44 @@ public class Settings implements Serializable {
     private InterfaceLanguages localization;
 
     //Getters
-    public InterfaceLanguages getLocalization() {
+    InterfaceLanguages getLocalization() {
         return localization;
     }
 
-    public String getServer() {
+    String getServer() {
         return server;
     }
 
-    public String getDatabase() {
+    String getDatabase() {
         return database;
     }
 
-    public String getLogin() {
+    String getLogin() {
         return login;
     }
 
-    public char[] getPassword() {
+    char[] getPassword() {
         return password;
     }
 
     //Setters
-    public void setLocalization(InterfaceLanguages localization) {
+    void setLocalization(InterfaceLanguages localization) {
         this.localization = localization;
     }
 
-    public void setServer(String server) {
+    void setServer(String server) {
         this.server = server;
     }
 
-    public void setDatabase(String database) {
+    void setDatabase(String database) {
         this.database = database;
     }
 
-    public void setLogin(String login) {
+    void setLogin(String login) {
         this.login = login;
     }
 
-    public void setPassword(char[] password) {
+    void setPassword(char[] password) {
         this.password = password;
     }
 }

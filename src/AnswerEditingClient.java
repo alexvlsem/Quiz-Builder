@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class AnswerEditingClient extends JDialog {
+class AnswerEditingClient extends JDialog {
 
     private ResourceBundle rb = LoginClient.rb;
     private AnswerEditingGUI answerEditingGUI;
@@ -52,10 +52,10 @@ public class AnswerEditingClient extends JDialog {
     /**
      * The AnswerEditingClient constructor.
      *
-     * @param dialog
-     * @param answer
+     * @param dialog the calling dialog.
+     * @param answer the instance of the Answer class.
      */
-    public AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
+     AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
         super(dialog, true);
 
         this.answer = answer;

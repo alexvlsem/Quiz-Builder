@@ -14,14 +14,14 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class ApplicationClient extends JFrame {
+class ApplicationClient extends JFrame {
 
     private static ResourceBundle rb = LoginClient.rb;
 
     private User user;
     private ApplicationGUI applicationGUI;
 
-    public ApplicationClient(User user) {
+    ApplicationClient(User user) {
         this.user = user;
 
         applicationGUI = new ApplicationGUI();
@@ -101,7 +101,7 @@ public class ApplicationClient extends JFrame {
 
         JButton buttonNewQuiz, buttonEditQuiz, buttonDeleteQuiz,
                 buttonAddUsers, buttonRemoveUsers;
-        JList listAllUsers, listAssignedToUsers;
+        JList<User> listAllUsers, listAssignedToUsers;
 
         JTable table;
         DefaultTableModel dm;
@@ -139,8 +139,8 @@ public class ApplicationClient extends JFrame {
             tablePanel.add(scrollPane);
             tablePanel.add(buttonsPanel);
 
-            listAllUsers = new JList();
-            listAssignedToUsers = new JList();
+            listAllUsers = new JList<>();
+            listAssignedToUsers = new JList<>();
             JScrollPane spAllUsers = new JScrollPane(listAllUsers);
             JScrollPane spAssignUsers = new JScrollPane(listAssignedToUsers);
             spAllUsers.setBorder(BorderFactory.createTitledBorder(rb.getString("tlAllUsers")));
@@ -199,17 +199,17 @@ public class ApplicationClient extends JFrame {
             if (rowInd >= 0) {
                 Quiz currQuiz = (Quiz) getTableValue(applicationGUI.yourQuizPanel.table, 1);
 
-                DefaultListModel<User> lm = new DefaultListModel<>();
+                DefaultListModel<User> lm1 = new DefaultListModel<>();
                 for (User u : DataBaseConnector.getUsersForAssignment(currQuiz, true)) {
-                    lm.addElement(u);
+                    lm1.addElement(u);
                 }
-                listAllUsers.setModel(lm);
+                listAllUsers.setModel(lm1);
 
-                lm = new DefaultListModel<>();
+                DefaultListModel<User> lm2 = new DefaultListModel<>();
                 for (User u : DataBaseConnector.getUsersForAssignment(currQuiz, false)) {
-                    lm.addElement(u);
+                    lm2.addElement(u);
                 }
-                listAssignedToUsers.setModel(lm);
+                listAssignedToUsers.setModel(lm2);
             }
         }
     }
@@ -389,7 +389,7 @@ public class ApplicationClient extends JFrame {
         YourQuizPanel yourQuizPanel;
         ResponsesPanel responsesPanel;
         AssignedQuizPanel assignedQuizPanel;
-        JComboBox profileAction;
+        JComboBox<String> profileAction;
         JTabbedPane tabbedPane;
         ApplicationHandler handler;
 
@@ -399,7 +399,7 @@ public class ApplicationClient extends JFrame {
             yourQuizPanel = new YourQuizPanel();
             responsesPanel = new ResponsesPanel();
             assignedQuizPanel = new AssignedQuizPanel();
-            profileAction = new JComboBox(new String[]{user.toString(),
+            profileAction = new JComboBox<>(new String[]{user.toString(),
                     rb.getString("tlChangeUser")});
 
             handler = new ApplicationHandler();
@@ -475,7 +475,6 @@ public class ApplicationClient extends JFrame {
                 Object currQuiz = getTableValue(applicationGUI.yourQuizPanel.table, 1);
                 if (currQuiz == null) {
                     JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheQuiz"));
-                    return;
                 } else {
                     if (!DataBaseConnector.deleteReference((Quiz) currQuiz)) {
                         JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msQuizCantBeRemoved"));
@@ -483,7 +482,6 @@ public class ApplicationClient extends JFrame {
                         applicationGUI.yourQuizPanel.refreshQuizTable();
                     }
                 }
-
             } else if (e.getSource() == applicationGUI.assignedQuizPanel.buttonStartQuiz) {
 
                 Object currQuiz = getTableValue(applicationGUI.assignedQuizPanel.table, 2);
@@ -544,14 +542,14 @@ public class ApplicationClient extends JFrame {
     }
 
     /**
-     * The fieldIsCorrect method checks that the value is not empty abd does't exceed max length.
+     * The fieldIsCorrect method checks that the value is not empty and does't exceed max length.
      *
      * @param string    the checked value.
      * @param maxLength max length of the checked value.
      * @param fieldName the name of the field name of the checked value.
      * @return result of checking
      */
-    public static boolean fieldIsCorrect(String string, int maxLength, String fieldName) {
+    static boolean fieldIsCorrect(String string, int maxLength, String fieldName) {
 
         string = string.trim();
         if (string.length() > 0 && string.length() <= maxLength) {
@@ -571,7 +569,7 @@ public class ApplicationClient extends JFrame {
      * @param column the number of column.
      * @return the gotten value or null.
      */
-    public static Object getTableValue(JTable table, int column) {
+    static Object getTableValue(JTable table, int column) {
 
         Object returnedValue = null;
 

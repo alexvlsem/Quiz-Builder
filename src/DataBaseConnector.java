@@ -7,17 +7,18 @@ import java.util.*;
  *
  * @author Aleksei_Semenov 20/08/16.
  */
-public class DataBaseConnector {
+class DataBaseConnector {
 
     private static Connection conn;
 
-    public static void createConnection() {
+    static void createConnection() {
 
         if (conn == null) {
-            String connectionUrl = "jdbc:sqlserver://" + LoginClient.settings.getServer() + ";" +
-                    "databaseName=" + LoginClient.settings.getDatabase() + ";" +
-                    "user=" + LoginClient.settings.getLogin() + ";" +
-                    "password=" + new String(LoginClient.settings.getPassword()) + ";";
+            String connectionUrl = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;",
+                    LoginClient.settings.getServer(),
+                    LoginClient.settings.getDatabase(),
+                    LoginClient.settings.getLogin(),
+                    new String(LoginClient.settings.getPassword()));
             try {
                 conn = DriverManager.getConnection(connectionUrl);
                 prepareDatabase();
@@ -32,19 +33,18 @@ public class DataBaseConnector {
      *
      * @return the connection status
      */
-    public static boolean connectionStatus() {
+    static boolean connectionStatus() {
         return conn != null;
     }
 
     /**
      * The closeConnection method closes the connection.
      */
-    public static void closeConnection() {
+    static void closeConnection() {
         if (conn != null) {
             try {
                 conn.close();
                 conn = null;
-                //System.out.println("connection closed");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -54,8 +54,6 @@ public class DataBaseConnector {
     /**
      * The prepareDatabase method calls the list of methods
      * to create new tables in the database.
-     *
-     * @throws SQLException
      */
     private static void prepareDatabase() throws SQLException {
 
@@ -183,7 +181,7 @@ public class DataBaseConnector {
     /**
      * The getUserRecord gets a record about the user.
      */
-    public static ArrayList<String> getUserRecord(String[] prm) {
+    static ArrayList<String> getUserRecord(String[] prm) {
 
         ArrayList<String> userData = new ArrayList<>();
 
@@ -208,7 +206,7 @@ public class DataBaseConnector {
     /**
      * The createUser method inserts a record about the user.
      */
-    public static ArrayList<String> createUser(String[] prm) {
+    static ArrayList<String> createUser(String[] prm) {
 
         ArrayList<String> userData = new ArrayList<>();
 
@@ -233,7 +231,7 @@ public class DataBaseConnector {
      *
      * @param quiz the instance of the Quiz class.
      */
-    public static void saveQuiz(Quiz quiz) {
+    static void saveQuiz(Quiz quiz) {
 
         if (quiz.getId() == 0) {
 
@@ -273,9 +271,9 @@ public class DataBaseConnector {
      * @return a two dimensional vector;
      * each row contains: a number of the row, a Quiz instance, a quiz type.
      */
-    public static Vector getQuizzes(User user) {
+    static Vector<Object> getQuizzes(User user) {
 
-        Vector rows = new Vector();
+        Vector<Object> rows = new Vector<>();
 
         String query = "SELECT * FROM Quizzes WHERE ownerId=? ORDER BY id";
 
@@ -285,7 +283,7 @@ public class DataBaseConnector {
 
             int num = 0;
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
 
                 row.add(++num);
                 Quiz quiz = new Quiz(rs.getInt("id"), rs.getString("name"),
@@ -308,7 +306,7 @@ public class DataBaseConnector {
      *
      * @param question the instance of the Question class.
      */
-    public static void saveQuestion(Question question) {
+    static void saveQuestion(Question question) {
 
         if (question.getId() == 0) {
 
@@ -351,9 +349,9 @@ public class DataBaseConnector {
      * each row contains: a number of the row, a Question instance,
      * a text of the question, an attribute of multiple choice of the question.
      */
-    public static Vector getQuestions(Quiz quiz) {
+    static Vector<Object> getQuestions(Quiz quiz) {
 
-        Vector rows = new Vector();
+        Vector<Object> rows = new Vector<>();
 
         String query = "SELECT * FROM Questions WHERE quizId=? ORDER BY id";
 
@@ -363,7 +361,7 @@ public class DataBaseConnector {
 
             int num = 0;
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 row.add(++num);
                 Question question = new Question(rs.getInt("id"), rs.getString("name"),
                         rs.getString("text"), rs.getBoolean("multipleChoice"), quiz);
@@ -385,7 +383,7 @@ public class DataBaseConnector {
      *
      * @param answer the instance of the Answer class.
      */
-    public static void saveAnswer(Answer answer) {
+    static void saveAnswer(Answer answer) {
 
         if (answer.getId() == 0) {
 
@@ -426,9 +424,9 @@ public class DataBaseConnector {
      * each row contains: a number of the row, an Answer instance,
      * an attribute of correctness of the answer.
      */
-    public static Vector getAnswers(Question question) {
+    static Vector<Object> getAnswers(Question question) {
 
-        Vector rows = new Vector();
+        Vector<Object> rows = new Vector<>();
 
         String query = "SELECT * FROM Answers WHERE questionId=? ORDER BY id";
 
@@ -438,7 +436,7 @@ public class DataBaseConnector {
 
             int num = 0;
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 row.add(++num);
                 Answer answer = new Answer(rs.getInt("id"), rs.getString("text"),
                         rs.getBoolean("correctness"), question);
@@ -461,7 +459,7 @@ public class DataBaseConnector {
      * @param inclusive are users assigned or not to the quiz.
      * @return the list of users
      */
-    public static ArrayList<User> getUsersForAssignment(Quiz quiz, boolean inclusive) {
+    static ArrayList<User> getUsersForAssignment(Quiz quiz, boolean inclusive) {
 
         ArrayList<User> users = new ArrayList<>();
 
@@ -498,7 +496,7 @@ public class DataBaseConnector {
      * @param users list of users.
      * @param quiz  the instance of the Quiz class.
      */
-    public static void assignQuizToUsers(ArrayList<User> users, Quiz quiz) {
+    static void assignQuizToUsers(ArrayList<User> users, Quiz quiz) {
 
         String query = "INSERT INTO AssignedQuizzes (userId, quizId, assignDate, quizCompleted, resultViewed ) " +
                 " VALUES (?, ?, ?, ?, ?);";
@@ -525,7 +523,7 @@ public class DataBaseConnector {
      * @param users list of users.
      * @param quiz  the instance of the Quiz class.
      */
-    public static void removeQuizFromUsers(ArrayList<User> users, Quiz quiz) {
+    static void removeQuizFromUsers(ArrayList<User> users, Quiz quiz) {
 
         String query = "DELETE FROM AssignedQuizzes WHERE userId =? AND quizId =? AND quizCompleted=?";
 
@@ -551,9 +549,9 @@ public class DataBaseConnector {
      * each row contains: a number of the row, a date of assignment, a Quiz instance,
      * an User instance (author), a quiz type.
      */
-    public static Vector getAssignedQuizzes(User user) {
+    static Vector<Object> getAssignedQuizzes(User user) {
 
-        Vector rows = new Vector();
+        Vector<Object> rows = new Vector<>();
 
         String query = "SELECT Users.login AS authorId, " +
                 "Users.firstName AS authorFirstName, " +
@@ -574,7 +572,7 @@ public class DataBaseConnector {
 
             int num = 0;
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 row.add(++num);
                 row.add(rs.getDate("assignDate"));
                 User author = new User(rs.getString("authorId"), rs.getString("authorFirstName"),
@@ -600,7 +598,7 @@ public class DataBaseConnector {
      * @param rows       a two dimensional vector with the selected answers.
      * @param respondent the user who is taking a quiz.
      */
-    public static void saveResponses(Vector rows, User respondent) {
+    static void saveResponses(Vector rows, User respondent) {
 
         String queryDel = "DELETE FROM QuizResponses WHERE respondentId=? AND answerId=?";
         String queryAdd = "INSERT INTO QuizResponses (respondentId, quizId, questionId, answerId, isSelected) " +
@@ -645,9 +643,9 @@ public class DataBaseConnector {
      * each row contains: a number of the row, an Answer instance,
      * selection of the answer.
      */
-    public static Vector getMarkedAnswers(User respondent, Question question) {
+    static Vector<Object> getMarkedAnswers(User respondent, Question question) {
 
-        Vector rows = new Vector();
+        Vector<Object> rows = new Vector<>();
 
         String query = "SELECT\n" +
                 "  Answers.id,\n" +
@@ -673,7 +671,7 @@ public class DataBaseConnector {
 
             int num = 0;
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 row.add(++num);
                 Answer answer = new Answer(rs.getInt("id"), rs.getString("text"),
                         rs.getBoolean("correctness"), question);
@@ -694,7 +692,7 @@ public class DataBaseConnector {
      * @param respondent the user who is taking a quiz.
      * @param quiz       the instance of the Quiz class.
      */
-    public static void finishQuiz(User respondent, Quiz quiz) {
+    static void finishQuiz(User respondent, Quiz quiz) {
         String query = "UPDATE AssignedQuizzes \n" +
                 "SET AssignedQuizzes.completeDate=?, AssignedQuizzes.quizCompleted=? \n" +
                 "WHERE AssignedQuizzes.quizId=? AND AssignedQuizzes.userId= ?";
@@ -719,9 +717,9 @@ public class DataBaseConnector {
      * each row contains: a date of completion, an User instance (respondent),
      * a Quiz instance, a type of quiz, the viewing of results.
      */
-    public static Vector getCompletedQuizzes(User user) {
+    static Vector getCompletedQuizzes(User user) {
 
-        Vector rows = new Vector();
+        Vector<Object> rows = new Vector<>();
 
         String query = "SELECT\n" +
                 "  AssignedQuizzes.userId,\n" +
@@ -742,9 +740,8 @@ public class DataBaseConnector {
             pstm.setBoolean(2, true);
             ResultSet rs = pstm.executeQuery();
 
-            int num = 0;
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
 
                 row.add(rs.getDate("completeDate"));
                 User respondent = new User(rs.getString("userId"), rs.getString("firstName"),
@@ -772,8 +769,8 @@ public class DataBaseConnector {
      * each row contains: a Question instance,
      * an Answer instance, selection of the answer.
      */
-    static Vector getQuizResults(User respondent, Quiz quiz) {
-        Vector rows = new Vector();
+    static Vector<Object> getQuizResults(User respondent, Quiz quiz) {
+        Vector<Object> rows = new Vector<>();
 
         String query = "SELECT\n" +
                 "  Questions.id AS questionId,\n" +
@@ -820,7 +817,7 @@ public class DataBaseConnector {
                 }
                 Answer currAnswer = new Answer(rs.getInt("answerId"), rs.getString("answerText"),
                         rs.getBoolean("correctAnswer"), currQuestion);
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 row.add(currQuestion);
                 row.add(currAnswer);
                 row.add(rs.getBoolean("selectedAnswer"));
@@ -834,14 +831,14 @@ public class DataBaseConnector {
     }
 
     /**
-     * The deleteReference deletes a record from the database.
+     * The deleteReference method deletes a record from the database.
      *
      * @param reference the instance of the Reference class.
      * @return the result of deletion.
      */
-    public static boolean deleteReference(Reference reference) {
+    static boolean deleteReference(Reference reference) {
 
-        String tableName = "";
+        String tableName = null;
         if (reference instanceof Quiz) {
             tableName = "Quizzes";
         } else if (reference instanceof Question) {
@@ -850,7 +847,9 @@ public class DataBaseConnector {
             tableName = "Answers";
         }
 
-        String query = "DELETE FROM  " + tableName + " WHERE id = ?";
+        assert (tableName != null);
+
+        String query = String.format("DELETE FROM  %s WHERE id = ?", tableName);
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setInt(1, reference.getId());
             pstm.execute();
@@ -866,7 +865,7 @@ public class DataBaseConnector {
      * @param respondent the instance of User class.
      * @param quiz       the instance of Quiz class.
      */
-    public static void makeResponseViewed(User respondent, Quiz quiz) {
+    static void makeResponseViewed(User respondent, Quiz quiz) {
 
         String query = "UPDATE AssignedQuizzes SET resultViewed =? WHERE userId=? AND quizId=?";
         try (PreparedStatement pstm = conn.prepareStatement(query)) {

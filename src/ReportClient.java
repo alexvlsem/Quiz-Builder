@@ -17,14 +17,17 @@ import javax.swing.text.html.HTMLWriter;
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class ReportClient extends JDialog {
+class ReportClient extends JDialog {
 
     private ResourceBundle rb = LoginClient.rb;
     private ReportGUI reportGUI;
     private User respondent;
     private Quiz quiz;
 
-    class ReportGUI extends JPanel {
+    /**
+     * The inner ReportGUI class creates the report panel.
+     */
+    private class ReportGUI extends JPanel {
 
         JButton buttonSaveToTheFile;
         JEditorPane editorPane;
@@ -219,7 +222,10 @@ public class ReportClient extends JDialog {
         validate();
     }
 
-    class ReportHandler implements ActionListener {
+    /**
+     * The ReportHandler class saves the report to the file.
+     */
+    private class ReportHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {

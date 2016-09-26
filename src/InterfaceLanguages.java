@@ -6,7 +6,7 @@ import java.io.Serializable;
  *
  * @author Aleksei_Semenov 2016-09-19.
  */
-public enum InterfaceLanguages implements Serializable {
+enum InterfaceLanguages implements Serializable {
     ENGLISH("English", "", ""),
     FRENCH("Français", "fr", "CA"),
     RUSSIAN("Русский", "ru", "RU");

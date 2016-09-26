@@ -3,13 +3,13 @@
  *
  * @author Aleksei_Semenov 10/08/16.
  */
-public class Answer extends Reference {
+class Answer extends Reference {
 
     private String text;
     private boolean correctness;
     private Question question;
 
-    public Answer(int id, String text, boolean correctness, Question question) {
+    Answer(int id, String text, boolean correctness, Question question) {
         super(id);
         setText(text);
         setCorrectness(correctness);
@@ -17,7 +17,7 @@ public class Answer extends Reference {
     }
 
     //Setters
-    public String getText() {
+    String getText() {
         return text;
     }
 
@@ -25,12 +25,12 @@ public class Answer extends Reference {
         return question;
     }
 
-    public boolean getCorrectness() {
+    boolean getCorrectness() {
         return correctness;
     }
 
     //Getters
-    public void setText(String text) {
+    void setText(String text) {
         this.text = text;
     }
 
@@ -38,7 +38,7 @@ public class Answer extends Reference {
         this.question = question;
     }
 
-    public void setCorrectness(boolean correctness) {
+    void setCorrectness(boolean correctness) {
         this.correctness = correctness;
     }
 

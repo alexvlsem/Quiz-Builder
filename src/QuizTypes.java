@@ -3,7 +3,7 @@
  *
  * @author Aleksei_Semenov 2016-09-07.
  */
-public enum QuizTypes {
+enum QuizTypes {
     TEST("test"), POLL("poll");
 
     String name;

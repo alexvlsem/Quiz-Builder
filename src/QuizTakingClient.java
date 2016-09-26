@@ -13,7 +13,7 @@ import java.util.Vector;
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class QuizTakingClient extends JDialog {
+class QuizTakingClient extends JDialog {
 
     private ResourceBundle rb = LoginClient.rb;
     private QuizTakingGUI quizTakingGUI;
@@ -23,12 +23,12 @@ public class QuizTakingClient extends JDialog {
     private class QuizTakingGUI extends JPanel {
 
         JTextArea questionText;
-        JList questionList;
+        JList<Question> questionList;
         JButton buttonPreviousQuestion, buttonNextQuestion,
                 buttonSaveAnswer, buttonFinishQuiz;
         JScrollPane scrollPaneAnswers;
         JPanel answerPanel;
-        Vector answerList = new Vector();
+        Vector<Vector> answerList = new Vector<>();
 
         QuizTakingGUI() {
 
@@ -67,7 +67,7 @@ public class QuizTakingClient extends JDialog {
             for (Object row : rows) {
                 lm.addElement((Question) ((Vector) row).get(1));
             }
-            questionList = new JList(lm);
+            questionList = new JList<>(lm);
             questionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
             JScrollPane scrollPaneAllQuestions = new JScrollPane(questionList);
@@ -109,7 +109,7 @@ public class QuizTakingClient extends JDialog {
 
             ButtonGroup group = new ButtonGroup();
 
-            Vector rows = DataBaseConnector.getMarkedAnswers(respondent, question);
+            Vector<Object> rows = DataBaseConnector.getMarkedAnswers(respondent, question);
             for (int i = 0; i < rows.size(); i++) {
                 Vector currRow = (Vector) rows.get(i);
 
@@ -143,7 +143,7 @@ public class QuizTakingClient extends JDialog {
                 c.gridy = i;
                 panel.add(textArea, c);
 
-                Vector rowAL = new Vector();
+                Vector<Object> rowAL = new Vector<>();
                 rowAL.add(false);
                 rowAL.add(currAnswer);
                 answerList.add(rowAL);
@@ -188,7 +188,7 @@ public class QuizTakingClient extends JDialog {
                         JCheckBox currButton = (JCheckBox) component;
                         isSelected = currButton.isSelected();
                     }
-                    Vector row = (Vector) quizTakingGUI.answerList.get(i / 3);
+                    Vector<Object> row = quizTakingGUI.answerList.get(i / 3);
                     row.set(0, isSelected);
                 }
                 DataBaseConnector.saveResponses(quizTakingGUI.answerList, respondent);
@@ -207,7 +207,7 @@ public class QuizTakingClient extends JDialog {
 
             if (e.getSource().equals(quizTakingGUI.questionList)) {
 
-                Question currQuestion = (Question) quizTakingGUI.questionList.getSelectedValue();
+                Question currQuestion = quizTakingGUI.questionList.getSelectedValue();
                 quizTakingGUI.questionText.setText(currQuestion.getText()); //Set the text of the question
                 quizTakingGUI.questionText.setCaretPosition(0); //move to the top
 
@@ -227,7 +227,7 @@ public class QuizTakingClient extends JDialog {
     /**
      * The QuizTakingClient constructor.
      */
-    public QuizTakingClient(ApplicationClient frame, Quiz quiz, User respondent) {
+    QuizTakingClient(ApplicationClient frame, Quiz quiz, User respondent) {
         super(frame, true);
         this.quiz = quiz;
         this.respondent = respondent;

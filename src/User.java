@@ -3,28 +3,28 @@
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class User {
+class User {
 
     private String login;
     private String firstName;
     private String lastName;
 
-    public User(String login, String firstName, String lastName) {
+    User(String login, String firstName, String lastName) {
         this.login = login;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
     //Getters
-    public String getFirstName() {
+    private String getFirstName() {
         return firstName;
     }
 
-    public String getLogin() {
+    String getLogin() {
         return login;
     }
 
-    public String getLastName() {
+    private String getLastName() {
         return lastName;
     }
 

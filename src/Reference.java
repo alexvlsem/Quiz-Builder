@@ -3,21 +3,21 @@
  *
  * @author Aleksei_Semenov 2016-09-25.
  */
-public abstract class Reference {
+abstract class Reference {
 
     private int id;
 
-    public Reference(int id) {
+    Reference(int id) {
         setId(id);
     }
 
     //Getters
-    public int getId() {
+    int getId() {
         return id;
     }
 
     //Setters
-    public void setId(int id) {
+    void setId(int id) {
         this.id = id;
     }
 }

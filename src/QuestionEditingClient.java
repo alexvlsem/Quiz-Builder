@@ -12,13 +12,13 @@ import java.util.Vector;
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-public class QuestionEditingClient extends JDialog {
+class QuestionEditingClient extends JDialog {
 
     private ResourceBundle rb = LoginClient.rb;
     private QuestionEditingGUI questionEditingGUI;
     private Question question;
 
-    public QuestionEditingClient(QuizEditingClient dialog, Question question) {
+    QuestionEditingClient(QuizEditingClient dialog, Question question) {
 
         super(dialog, true);
 
