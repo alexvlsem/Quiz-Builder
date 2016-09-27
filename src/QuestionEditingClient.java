@@ -7,36 +7,32 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 
 /**
- * The QuestionEditingClient class creates the form for editing a question of the quiz;
+ * The QuestionEditingClient class creates the form
+ * for editing a question of the quiz;
  * is called from an instance of the QuizEditingClient class.
  *
  * @author Aleksei_Semenov 17/08/16.
  */
 class QuestionEditingClient extends JDialog {
 
-    private ResourceBundle rb = LoginClient.rb;
+    private ResourceBundle rb = LoginClient.getRb();
     private QuestionEditingGUI questionEditingGUI;
     private Question question;
 
     QuestionEditingClient(QuizEditingClient dialog, Question question) {
 
         super(dialog, true);
-
         this.question = question;
 
         questionEditingGUI = new QuestionEditingGUI();
 
         Container container = getContentPane();
         container.setLayout(new BorderLayout());
-
         container.add(questionEditingGUI, BorderLayout.CENTER);
 
         setTitle("Quiz-Builder (" + rb.getString("tlQuestionEditing") + ")");
-
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         pack();
-
         setLocationRelativeTo(null);
         setVisible(true);
         validate();
@@ -60,10 +56,12 @@ class QuestionEditingClient extends JDialog {
         QuestionEditingGUI() {
 
             questionName = new JTextField(20);
-            questionName.setBorder(BorderFactory.createTitledBorder(rb.getString("tlQuestionName")));
+            questionName.setBorder(BorderFactory.createTitledBorder(
+                    rb.getString("tlQuestionName")));
             multipleChoice = new JCheckBox(rb.getString("tlMultipleChoice"));
             questionText = new JTextArea(8, 20);
-            questionText.setBorder(BorderFactory.createTitledBorder(rb.getString("tlText")));
+            questionText.setBorder(BorderFactory.createTitledBorder(
+                    rb.getString("tlText")));
 
             if (question.getName() != null) {
                 questionName.setText(question.getName());
@@ -97,7 +95,8 @@ class QuestionEditingClient extends JDialog {
             headings.addElement(rb.getString("tlAnswer"));
             headings.addElement(rb.getString("tlRight"));
 
-            dm = new DefaultTableModel(DataBaseConnector.getAnswers(question), headings);
+            dm = new DefaultTableModel(DataBaseConnector.getAnswers(question),
+                    headings);
             table = new JTable(dm);
             formatTable();
 
@@ -119,7 +118,8 @@ class QuestionEditingClient extends JDialog {
 
         void formatTable() {
 
-            assert (table != null) : "The variable table in the instance of the inner QuestionEditingGUI class " +
+            assert (table != null) : "The variable table in the instance of " +
+                    "the inner QuestionEditingGUI class " +
                     "of the QuestionEditingClient class is null";
 
             table.getColumn(rb.getString("tlNumber")).setMaxWidth(50);
@@ -127,7 +127,7 @@ class QuestionEditingClient extends JDialog {
 
             for (int c = 0; c < table.getColumnCount(); c++) {
                 Class<?> col_class = table.getColumnClass(c);
-                table.setDefaultEditor(col_class, null);        // remove editor
+                table.setDefaultEditor(col_class, null);   // remove editor
             }
         }
 
@@ -144,7 +144,8 @@ class QuestionEditingClient extends JDialog {
     }
 
     /**
-     * The inner QuestionHandler class handles all events of the  QuestionEditingClient instance.
+     * The inner QuestionHandler class handles all events of the
+     * QuestionEditingClient instance.
      */
     private class QuestionHandler implements ActionListener {
 
@@ -153,41 +154,50 @@ class QuestionEditingClient extends JDialog {
 
             if (e.getSource() == questionEditingGUI.buttonNewAnswer) {
                 if (question.getId() == 0) {
-                    JOptionPane.showMessageDialog(QuestionEditingClient.this, rb.getString("msSaveTheQuestion"));
+                    JOptionPane.showMessageDialog(QuestionEditingClient.this,
+                            rb.getString("msSaveTheQuestion"));
                     return;
                 }
-                new AnswerEditingClient(QuestionEditingClient.this, new Answer(0, null, false, question));
+                new AnswerEditingClient(QuestionEditingClient.this,
+                        new Answer(0, null, false, question));
                 questionEditingGUI.refreshAnswers();
             } else if (e.getSource() == questionEditingGUI.buttonEditAnswer) {
 
-                Object answer = ApplicationClient.getTableValue(questionEditingGUI.table, 1);
+                Object answer =
+                        ApplicationClient.getTableValue(questionEditingGUI.table, 1);
 
                 if (answer == null) {
-                    JOptionPane.showMessageDialog(QuestionEditingClient.this, rb.getString("msSelectTheRow"));
+                    JOptionPane.showMessageDialog(QuestionEditingClient.this,
+                            rb.getString("msSelectTheRow"));
                 } else {
                     new AnswerEditingClient(QuestionEditingClient.this, (Answer) answer);
                     questionEditingGUI.refreshAnswers();
                 }
-
             } else if (e.getSource() == questionEditingGUI.buttonSaveQuiz) {
 
                 String questionName = questionEditingGUI.questionName.getText(),
                         questionText = questionEditingGUI.questionText.getText();
-                if (ApplicationClient.fieldIsCorrect(questionName, 225, rb.getString("tlQuestionName")) &&
-                        ApplicationClient.fieldIsCorrect(questionText, 2000, rb.getString("tlText"))) {
+                if (ApplicationClient.fieldIsCorrect(questionName, 225,
+                        rb.getString("tlQuestionName")) &&
+                        ApplicationClient.fieldIsCorrect(questionText, 2000,
+                                rb.getString("tlText"))) {
                     question.setName(questionName);
                     question.setText(questionText);
-                    question.setMultipleChoice(questionEditingGUI.multipleChoice.isSelected());
+                    question.setMultipleChoice(
+                            questionEditingGUI.multipleChoice.isSelected());
                     DataBaseConnector.saveQuestion(question);
                 }
             } else if (e.getSource() == questionEditingGUI.buttonDeleteAnswer) {
-                Object answer = ApplicationClient.getTableValue(questionEditingGUI.table, 1);
+                Object answer =
+                        ApplicationClient.getTableValue(questionEditingGUI.table, 1);
 
                 if (answer == null) {
-                    JOptionPane.showMessageDialog(QuestionEditingClient.this, rb.getString("msSelectTheRow"));
+                    JOptionPane.showMessageDialog(QuestionEditingClient.this,
+                            rb.getString("msSelectTheRow"));
                 } else {
                     if (!DataBaseConnector.deleteReference((Answer) answer)) {
-                        JOptionPane.showMessageDialog(QuestionEditingClient.this, rb.getString("msAnswerCantBeRemoved"));
+                        JOptionPane.showMessageDialog(QuestionEditingClient.this,
+                                rb.getString("msAnswerCantBeRemoved"));
                     } else {
                         questionEditingGUI.refreshAnswers();
                     }

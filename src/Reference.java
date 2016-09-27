@@ -1,5 +1,6 @@
 /**
- * The abstract Reference class is extended by Quiz, Question and Answer classes.
+ * The abstract Reference class is extended by Quiz, Question and Answer
+ * classes.
  *
  * @author Aleksei_Semenov 2016-09-25.
  */

@@ -7,6 +7,8 @@ import java.io.Serializable;
  */
 class Settings implements Serializable {
 
+    private static final long serialVersionUID = 135737672033666209L;
+
     private String
             server,
             database,

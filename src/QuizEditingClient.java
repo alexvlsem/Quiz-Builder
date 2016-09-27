@@ -16,7 +16,7 @@ import java.util.Vector;
  */
 class QuizEditingClient extends JDialog {
 
-    private ResourceBundle rb = LoginClient.rb;
+    private ResourceBundle rb = LoginClient.getRb();
     private QuizEditingGUI quizEditingGUI;
     private Quiz quiz;
 

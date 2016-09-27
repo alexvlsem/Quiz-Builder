@@ -14,11 +14,12 @@ class DataBaseConnector {
     static void createConnection() {
 
         if (conn == null) {
-            String connectionUrl = String.format("jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;",
-                    LoginClient.settings.getServer(),
-                    LoginClient.settings.getDatabase(),
-                    LoginClient.settings.getLogin(),
-                    new String(LoginClient.settings.getPassword()));
+            String connectionUrl = String.format(
+                    "jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;",
+                    LoginClient.getSettings().getServer(),
+                    LoginClient.getSettings().getDatabase(),
+                    LoginClient.getSettings().getLogin(),
+                    new String(LoginClient.getSettings().getPassword()));
             try {
                 conn = DriverManager.getConnection(connectionUrl);
                 prepareDatabase();
@@ -195,7 +196,7 @@ class DataBaseConnector {
                 userData.add(rs.getString(1));
                 userData.add(rs.getString(2));
             } else {
-                userData.add(LoginClient.rb.getString("msUserIsNotFound"));
+                userData.add(LoginClient.getRb().getString("msUserIsNotFound"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -214,7 +215,7 @@ class DataBaseConnector {
             ResultSet rs = stmt.executeQuery(
                     "SELECT firstName, lastName FROM Users WHERE login='" + prm[0] + "'");
             if (rs.next()) {
-                userData.add(LoginClient.rb.getString("msLoginIsBeenUsed"));
+                userData.add(LoginClient.getRb().getString("msLoginIsBeenUsed"));
             } else {
                 stmt.executeUpdate("INSERT INTO Users (login, firstName, lastName, password) " +
                         "VALUES ( '" + prm[0] + "', '" + prm[1] + "', '" + prm[2] + "', '" + prm[3] + "')");
@@ -363,8 +364,12 @@ class DataBaseConnector {
             while (rs.next()) {
                 Vector<Object> row = new Vector<>();
                 row.add(++num);
-                Question question = new Question(rs.getInt("id"), rs.getString("name"),
-                        rs.getString("text"), rs.getBoolean("multipleChoice"), quiz);
+                Question question = new Question(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("text"),
+                        rs.getBoolean("multipleChoice"),
+                        quiz);
                 row.add(question);
                 row.add(question.getText());
                 row.add(question.getMultipleChoice());
@@ -438,8 +443,11 @@ class DataBaseConnector {
             while (rs.next()) {
                 Vector<Object> row = new Vector<>();
                 row.add(++num);
-                Answer answer = new Answer(rs.getInt("id"), rs.getString("text"),
-                        rs.getBoolean("correctness"), question);
+                Answer answer = new Answer(
+                        rs.getInt("id"),
+                        rs.getString("text"),
+                        rs.getBoolean("correctness"),
+                        question);
                 row.add(answer);
                 row.add(answer.getCorrectness());
 
@@ -575,10 +583,15 @@ class DataBaseConnector {
                 Vector<Object> row = new Vector<>();
                 row.add(++num);
                 row.add(rs.getDate("assignDate"));
-                User author = new User(rs.getString("authorId"), rs.getString("authorFirstName"),
+                User author = new User(
+                        rs.getString("authorId"),
+                        rs.getString("authorFirstName"),
                         rs.getString("authorLastName"));
-                Quiz quiz = new Quiz(rs.getInt("quizID"), rs.getString("quizName"),
-                        QuizTypes.valueOf(rs.getString("quizType")), author);
+                Quiz quiz = new Quiz(
+                        rs.getInt("quizID"),
+                        rs.getString("quizName"),
+                        QuizTypes.valueOf(rs.getString("quizType")),
+                        author);
                 row.add(quiz);
                 row.add(author);
                 row.add(quiz.getType());
@@ -600,8 +613,10 @@ class DataBaseConnector {
      */
     static void saveResponses(Vector rows, User respondent) {
 
-        String queryDel = "DELETE FROM QuizResponses WHERE respondentId=? AND answerId=?";
-        String queryAdd = "INSERT INTO QuizResponses (respondentId, quizId, questionId, answerId, isSelected) " +
+        String queryDel = "DELETE FROM QuizResponses " +
+                "WHERE respondentId=? AND answerId=?";
+        String queryAdd = "INSERT INTO QuizResponses " +
+                "(respondentId, quizId, questionId, answerId, isSelected) " +
                 " VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmDel = conn.prepareStatement(queryDel);
@@ -673,11 +688,13 @@ class DataBaseConnector {
             while (rs.next()) {
                 Vector<Object> row = new Vector<>();
                 row.add(++num);
-                Answer answer = new Answer(rs.getInt("id"), rs.getString("text"),
-                        rs.getBoolean("correctness"), question);
+                Answer answer = new Answer(
+                        rs.getInt("id"),
+                        rs.getString("text"),
+                        rs.getBoolean("correctness"),
+                        question);
                 row.add(answer);
                 row.add(rs.getBoolean("isSelected"));
-
                 rows.add(row);
             }
         } catch (SQLException e) {
@@ -687,7 +704,8 @@ class DataBaseConnector {
     }
 
     /**
-     * The finishQuiz method updates the record about an assigned quiz making the quz completed.
+     * The finishQuiz method updates the record about an assigned quiz
+     * making the quiz completed.
      *
      * @param respondent the user who is taking a quiz.
      * @param quiz       the instance of the Quiz class.
@@ -744,10 +762,15 @@ class DataBaseConnector {
                 Vector<Object> row = new Vector<>();
 
                 row.add(rs.getDate("completeDate"));
-                User respondent = new User(rs.getString("userId"), rs.getString("firstName"),
+                User respondent = new User(
+                        rs.getString("userId"),
+                        rs.getString("firstName"),
                         rs.getString("lastName"));
-                Quiz quiz = new Quiz(rs.getInt("quizId"), rs.getString("quizName"),
-                        QuizTypes.valueOf(rs.getString("quizType")), user);
+                Quiz quiz = new Quiz(
+                        rs.getInt("quizId"),
+                        rs.getString("quizName"),
+                        QuizTypes.valueOf(rs.getString("quizType")),
+                        user);
                 row.add(respondent);
                 row.add(quiz);
                 row.add(quiz.getType());
@@ -812,11 +835,18 @@ class DataBaseConnector {
             while (rs.next()) {
 
                 if (currQuestion == null || currQuestion.getId() != rs.getInt("questionId")) {
-                    currQuestion = new Question(rs.getInt("questionId"), rs.getString("questionName"),
-                            rs.getString("questionText"), rs.getBoolean("multipleChoice"), quiz);
+                    currQuestion = new Question(
+                            rs.getInt("questionId"),
+                            rs.getString("questionName"),
+                            rs.getString("questionText"),
+                            rs.getBoolean("multipleChoice"),
+                            quiz);
                 }
-                Answer currAnswer = new Answer(rs.getInt("answerId"), rs.getString("answerText"),
-                        rs.getBoolean("correctAnswer"), currQuestion);
+                Answer currAnswer = new Answer(
+                        rs.getInt("answerId"),
+                        rs.getString("answerText"),
+                        rs.getBoolean("correctAnswer"),
+                        currQuestion);
                 Vector<Object> row = new Vector<>();
                 row.add(currQuestion);
                 row.add(currAnswer);
@@ -867,7 +897,8 @@ class DataBaseConnector {
      */
     static void makeResponseViewed(User respondent, Quiz quiz) {
 
-        String query = "UPDATE AssignedQuizzes SET resultViewed =? WHERE userId=? AND quizId=?";
+        String query = "UPDATE AssignedQuizzes SET resultViewed =? " +
+                "WHERE userId=? AND quizId=?";
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setBoolean(1, true);
             pstm.setString(2, respondent.getLogin());

@@ -5,14 +5,14 @@ import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 /**
- * The AnswerEditingClient class creates the form for editing an answer for the question;
- * is called from an instance of the QuestionEditingClient class.
+ * The AnswerEditingClient class creates the form for editing an answer for the
+ * question; is called from an instance of the QuestionEditingClient class.
  *
  * @author Aleksei_Semenov 17/08/16.
  */
 class AnswerEditingClient extends JDialog {
 
-    private ResourceBundle rb = LoginClient.rb;
+    private ResourceBundle rb = LoginClient.getRb();
     private AnswerEditingGUI answerEditingGUI;
     private Answer answer;
 
@@ -55,7 +55,7 @@ class AnswerEditingClient extends JDialog {
      * @param dialog the calling dialog.
      * @param answer the instance of the Answer class.
      */
-     AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
+    AnswerEditingClient(QuestionEditingClient dialog, Answer answer) {
         super(dialog, true);
 
         this.answer = answer;

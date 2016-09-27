@@ -20,8 +20,8 @@ import javax.swing.*;
  */
 public class LoginClient extends JFrame {
 
-    static Settings settings;
-    static ResourceBundle rb;
+    private static Settings settings;
+    private static ResourceBundle rb;
 
     private LoginPanelGUI loginPanelGUI;
     private JTabbedPane tabbedPane;
@@ -455,5 +455,23 @@ public class LoginClient extends JFrame {
             System.err.println("Couldn't find file: " + path);
             return null;
         }
+    }
+
+    /**
+     * Getter for current resource bundle.
+     *
+     * @return current resource bundle.
+     */
+    static ResourceBundle getRb(){
+        return rb;
+    }
+
+    /**
+     * Getter for current settings.
+     *
+     * @return current settings.
+     */
+    static Settings getSettings(){
+        return settings;
     }
 }

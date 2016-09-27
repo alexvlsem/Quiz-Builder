@@ -19,7 +19,7 @@ import javax.swing.text.html.HTMLWriter;
  */
 class ReportClient extends JDialog {
 
-    private ResourceBundle rb = LoginClient.rb;
+    private ResourceBundle rb = LoginClient.getRb();
     private ReportGUI reportGUI;
     private User respondent;
     private Quiz quiz;

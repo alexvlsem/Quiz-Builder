@@ -16,7 +16,7 @@ import javax.swing.table.DefaultTableModel;
  */
 class ApplicationClient extends JFrame {
 
-    private static ResourceBundle rb = LoginClient.rb;
+    private static ResourceBundle rb = LoginClient.getRb();
 
     private User user;
     private ApplicationGUI applicationGUI;
@@ -143,8 +143,10 @@ class ApplicationClient extends JFrame {
             listAssignedToUsers = new JList<>();
             JScrollPane spAllUsers = new JScrollPane(listAllUsers);
             JScrollPane spAssignUsers = new JScrollPane(listAssignedToUsers);
-            spAllUsers.setBorder(BorderFactory.createTitledBorder(rb.getString("tlAllUsers")));
-            spAssignUsers.setBorder(BorderFactory.createTitledBorder(rb.getString("tlAssignedTo")));
+            spAllUsers.setBorder(BorderFactory.createTitledBorder(
+                    rb.getString("tlAllUsers")));
+            spAssignUsers.setBorder(BorderFactory.createTitledBorder(
+                    rb.getString("tlAssignedTo")));
             spAllUsers.setPreferredSize(new Dimension(250, 120));
             spAssignUsers.setPreferredSize(new Dimension(250, 120));
 
@@ -168,7 +170,8 @@ class ApplicationClient extends JFrame {
 
         void formatTable() {
 
-            assert (table != null) : "The variable table in the instance of the inner YourQuizPanel class " +
+            assert (table != null) : "The variable table in the instance of " +
+                    "the inner YourQuizPanel class " +
                     "of the ApplicationClient class is null";
 
             table.getColumn(rb.getString("tlNumber")).setMaxWidth(50);
@@ -234,7 +237,8 @@ class ApplicationClient extends JFrame {
             headings.addElement(rb.getString("tlViewed"));
 
             //Creates new table and adds it to the scroll pane
-            dm = new DefaultTableModel(DataBaseConnector.getCompletedQuizzes(user), headings);
+            dm = new DefaultTableModel(
+                    DataBaseConnector.getCompletedQuizzes(user), headings);
             table = new JTable(dm);
             formatTable();
 
@@ -290,8 +294,9 @@ class ApplicationClient extends JFrame {
 
             String info = rb.getString("msInfo5");
             if (newResponses > 0) {
-                info = rb.getString("msInfo2") + newResponses + rb.getString("msInfo6")
-                        + (newResponses > 1 ? rb.getString("msInfo7") : "");
+                info = rb.getString("msInfo2") + newResponses +
+                        rb.getString("msInfo6") +
+                        (newResponses > 1 ? rb.getString("msInfo7") : "");
             }
             applicationGUI.mainPanel.textNewResponses.setText(info);
         }
@@ -318,7 +323,8 @@ class ApplicationClient extends JFrame {
             headings.addElement(rb.getString("tlCompleted"));
 
             //Creates new table and adds it to the scroll pane
-            dm = new DefaultTableModel(DataBaseConnector.getAssignedQuizzes(user), headings);
+            dm = new DefaultTableModel(
+                    DataBaseConnector.getAssignedQuizzes(user), headings);
             table = new JTable(dm);
             formatTable();
 
@@ -353,7 +359,8 @@ class ApplicationClient extends JFrame {
         void refreshTable() {
 
             int currRow = table.getSelectedRow();
-            dm.setDataVector(DataBaseConnector.getAssignedQuizzes(user), headings);
+            dm.setDataVector(
+                    DataBaseConnector.getAssignedQuizzes(user), headings);
 
             formatTable();
             refreshInfo();
@@ -412,7 +419,8 @@ class ApplicationClient extends JFrame {
             yourQuizPanel.buttonDeleteQuiz.addActionListener(handler);
             yourQuizPanel.buttonAddUsers.addActionListener(handler);
             yourQuizPanel.buttonRemoveUsers.addActionListener(handler);
-            yourQuizPanel.table.getSelectionModel().addListSelectionListener(handler);
+            yourQuizPanel.table.getSelectionModel().
+                    addListSelectionListener(handler);
             responsesPanel.buttonCreateReport.addActionListener(handler);
             assignedQuizPanel.buttonStartQuiz.addActionListener(handler);
 
@@ -434,7 +442,9 @@ class ApplicationClient extends JFrame {
     /**
      * The inner ApplicationHandler class handles all events of the ApplicationClient instance.
      */
-    private class ApplicationHandler extends WindowAdapter implements ActionListener, ItemListener, ListSelectionListener {
+    private class ApplicationHandler
+            extends WindowAdapter
+            implements ActionListener, ItemListener, ListSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -448,7 +458,8 @@ class ApplicationClient extends JFrame {
                 Object currRespondent = getTableValue(applicationGUI.responsesPanel.table, 1);
                 Object currQuiz = getTableValue(applicationGUI.responsesPanel.table, 2);
                 if (currRespondent == null || currQuiz == null) {
-                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheResponse"));
+                    JOptionPane.showMessageDialog(
+                            ApplicationClient.this, rb.getString("msSelectTheResponse"));
                     return;
                 }
                 new ReportClient(ApplicationClient.this, (User) currRespondent, (Quiz) currQuiz);
@@ -465,7 +476,8 @@ class ApplicationClient extends JFrame {
 
                 Object currQuiz = getTableValue(applicationGUI.yourQuizPanel.table, 1);
                 if (currQuiz == null) {
-                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheQuiz"));
+                    JOptionPane.showMessageDialog(ApplicationClient.this,
+                            rb.getString("msSelectTheQuiz"));
                     return;
                 }
                 new QuizEditingClient(ApplicationClient.this, (Quiz) currQuiz);
@@ -474,10 +486,12 @@ class ApplicationClient extends JFrame {
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonDeleteQuiz) {
                 Object currQuiz = getTableValue(applicationGUI.yourQuizPanel.table, 1);
                 if (currQuiz == null) {
-                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheQuiz"));
+                    JOptionPane.showMessageDialog(ApplicationClient.this,
+                            rb.getString("msSelectTheQuiz"));
                 } else {
                     if (!DataBaseConnector.deleteReference((Quiz) currQuiz)) {
-                        JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msQuizCantBeRemoved"));
+                        JOptionPane.showMessageDialog(ApplicationClient.this,
+                                rb.getString("msQuizCantBeRemoved"));
                     } else {
                         applicationGUI.yourQuizPanel.refreshQuizTable();
                     }
@@ -486,10 +500,12 @@ class ApplicationClient extends JFrame {
 
                 Object currQuiz = getTableValue(applicationGUI.assignedQuizPanel.table, 2);
                 if (currQuiz == null) {
-                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msSelectTheQuiz"));
+                    JOptionPane.showMessageDialog(ApplicationClient.this,
+                            rb.getString("msSelectTheQuiz"));
                     return;
                 } else if ((boolean) getTableValue(applicationGUI.assignedQuizPanel.table, 5)) {
-                    JOptionPane.showMessageDialog(ApplicationClient.this, rb.getString("msQuizIsCompleted"));
+                    JOptionPane.showMessageDialog(ApplicationClient.this,
+                            rb.getString("msQuizIsCompleted"));
                     return;
                 }
                 new QuizTakingClient(ApplicationClient.this, (Quiz) currQuiz, user);
@@ -555,8 +571,10 @@ class ApplicationClient extends JFrame {
         if (string.length() > 0 && string.length() <= maxLength) {
             return true;
         } else {
-            JOptionPane.showMessageDialog(null, fieldName + rb.getString("msCheckValue4")
-                            + maxLength + rb.getString("msCheckValue2"), rb.getString("msCheckValue3"),
+            JOptionPane.showMessageDialog(null, fieldName +
+                            rb.getString("msCheckValue4") +
+                            maxLength + rb.getString("msCheckValue2"),
+                    rb.getString("msCheckValue3"),
                     JOptionPane.ERROR_MESSAGE);
             return false;
         }
