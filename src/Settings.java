@@ -9,12 +9,29 @@ class Settings implements Serializable {
 
     private static final long serialVersionUID = 135737672033666209L;
 
+    //Singleton
+    private volatile static Settings settings;
+
     private String
             server,
             database,
             login;
     private char[] password;
     private InterfaceLanguages localization;
+
+    private Settings() {
+    }
+
+    public static Settings getInstance() {
+        if (settings == null) {
+            synchronized (Settings.class) {
+                if (settings == null) {
+                    settings = new Settings();
+                }
+            }
+        }
+        return settings;
+    }
 
     //Getters
     InterfaceLanguages getLocalization() {

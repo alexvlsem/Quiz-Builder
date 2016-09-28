@@ -392,9 +392,11 @@ class DataBaseConnector {
 
         if (answer.getId() == 0) {
 
-            String query = "INSERT INTO Answers (text, correctness, questionId) VALUES (?, ?, ?)";
+            String query = "INSERT INTO Answers (text, correctness, questionId) " +
+                    "VALUES (?, ?, ?)";
 
-            try (PreparedStatement pstm = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement pstm = conn.prepareStatement(query,
+                    Statement.RETURN_GENERATED_KEYS)) {
                 pstm.setString(1, answer.getText());
                 pstm.setBoolean(2, answer.getCorrectness());
                 pstm.setInt(3, answer.getQuestion().getId());

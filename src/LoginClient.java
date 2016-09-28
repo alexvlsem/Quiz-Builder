@@ -314,7 +314,7 @@ public class LoginClient extends JFrame {
             } else if (e.getSource() == loginPanelGUI.settingsPanel.buttonSave) {
 
                 if (settings == null) {
-                    settings = new Settings();
+                    settings = Settings.getInstance();
                 }
 
                 settings.setServer(loginPanelGUI.settingsPanel.server.getText());
@@ -332,7 +332,7 @@ public class LoginClient extends JFrame {
                 }
             } else if (e.getSource() == loginPanelGUI.settingsPanel.buttonTestConnection) {
                 if (settings == null) {
-                    settings = new Settings();
+                    settings = Settings.getInstance();
                 }
                 settings.setServer(loginPanelGUI.settingsPanel.server.getText());
                 settings.setDatabase(loginPanelGUI.settingsPanel.database.getText());
