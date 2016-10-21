@@ -19,6 +19,7 @@ class Settings implements Serializable {
     private char[] password;
     private InterfaceLanguages localization;
 
+
     private Settings() {
     }
 

@@ -441,7 +441,12 @@ public class LoginClient extends JFrame {
 
         loadSettings();
 
-        new LoginClient();
+        LoginClient lc = new LoginClient();
+        //For the testing
+        /*lc.loginPanelGUI.loginPanel.login.setText("al");
+        lc.loginPanelGUI.loginPanel.password.setText("123");
+        lc.loginPanelGUI.loginPanel.buttonSignIn.doClick();*/
+
     }
 
     /**

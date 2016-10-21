@@ -30,7 +30,7 @@ class DataBaseConnector {
     }
 
     /**
-     * The connectionStatus method returns the connection status.
+     * The connectionStatus method checks the connection status.
      *
      * @return the connection status
      */
@@ -218,7 +218,10 @@ class DataBaseConnector {
                 userData.add(LoginClient.getRb().getString("msLoginIsBeenUsed"));
             } else {
                 stmt.executeUpdate("INSERT INTO Users (login, firstName, lastName, password) " +
-                        "VALUES ( '" + prm[0] + "', '" + prm[1] + "', '" + prm[2] + "', '" + prm[3] + "')");
+                        "VALUES ( '" + prm[0] + "'," +
+                        " '" + prm[1] + "'," +
+                        " '" + prm[2] + "'," +
+                        " '" + prm[3] + "')");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -241,7 +244,7 @@ class DataBaseConnector {
             try (PreparedStatement pstm = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
                 pstm.setString(1, quiz.getName());
                 pstm.setString(2, quiz.getType().name());
-                pstm.setString(3, quiz.getOwner().getLogin());
+                pstm.setString(3, quiz.getOwner().getId());
                 pstm.executeUpdate();
                 ResultSet rs = pstm.getGeneratedKeys();
                 rs.next();
@@ -279,7 +282,7 @@ class DataBaseConnector {
         String query = "SELECT * FROM Quizzes WHERE ownerId=? ORDER BY id";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
-            pstm.setString(1, user.getLogin());
+            pstm.setString(1, user.getId());
             ResultSet rs = pstm.executeQuery();
 
             int num = 0;
@@ -514,7 +517,7 @@ class DataBaseConnector {
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
 
             for (User u : users) {
-                pstm.setString(1, u.getLogin());
+                pstm.setString(1, u.getId());
                 pstm.setInt(2, quiz.getId());
                 pstm.setDate(3, new Date(System.currentTimeMillis()));
                 pstm.setBoolean(4, false);
@@ -540,7 +543,7 @@ class DataBaseConnector {
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
 
             for (User u : users) {
-                pstm.setString(1, u.getLogin());
+                pstm.setString(1, u.getId());
                 pstm.setInt(2, quiz.getId());
                 pstm.setBoolean(3, false);
                 pstm.addBatch();
@@ -577,7 +580,7 @@ class DataBaseConnector {
                 "WHERE AssignedQuizzes.userId =?";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
-            pstm.setString(1, user.getLogin());
+            pstm.setString(1, user.getId());
             ResultSet rs = pstm.executeQuery();
 
             int num = 0;
@@ -632,12 +635,12 @@ class DataBaseConnector {
                 Answer answer = (Answer) row.get(1);
 
                 //removes old records
-                pstmDel.setString(1, respondent.getLogin());
+                pstmDel.setString(1, respondent.getId());
                 pstmDel.setInt(2, answer.getId());
                 pstmDel.addBatch();
 
                 //writes new records
-                pstmAdd.setString(1, respondent.getLogin());
+                pstmAdd.setString(1, respondent.getId());
                 pstmAdd.setInt(2, answer.getQuestion().getQuiz().getId());
                 pstmAdd.setInt(3, answer.getQuestion().getId());
                 pstmAdd.setInt(4, answer.getId());
@@ -682,7 +685,7 @@ class DataBaseConnector {
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
 
-            pstm.setString(1, respondent.getLogin());
+            pstm.setString(1, respondent.getId());
             pstm.setInt(2, question.getId());
             ResultSet rs = pstm.executeQuery();
 
@@ -720,7 +723,7 @@ class DataBaseConnector {
             pstm.setDate(1, new Date(System.currentTimeMillis()));
             pstm.setBoolean(2, true);
             pstm.setInt(3, quiz.getId());
-            pstm.setString(4, respondent.getLogin());
+            pstm.setString(4, respondent.getId());
 
             pstm.execute();
 
@@ -756,7 +759,7 @@ class DataBaseConnector {
                 "WHERE Quizzes.ownerId = ? AND AssignedQuizzes.quizCompleted = ?";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
-            pstm.setString(1, user.getLogin());
+            pstm.setString(1, user.getId());
             pstm.setBoolean(2, true);
             ResultSet rs = pstm.executeQuery();
 
@@ -828,7 +831,7 @@ class DataBaseConnector {
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
 
-            pstm.setString(1, respondent.getLogin());
+            pstm.setString(1, respondent.getId());
             pstm.setInt(2, quiz.getId());
             ResultSet rs = pstm.executeQuery();
 
@@ -868,7 +871,7 @@ class DataBaseConnector {
      * @param reference the instance of the Reference class.
      * @return the result of deletion.
      */
-    static boolean deleteReference(Reference reference) {
+    static boolean deleteReference(Reference<Integer> reference) {
 
         String tableName = null;
         if (reference instanceof Quiz) {
@@ -903,7 +906,7 @@ class DataBaseConnector {
                 "WHERE userId=? AND quizId=?";
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setBoolean(1, true);
-            pstm.setString(2, respondent.getLogin());
+            pstm.setString(2, respondent.getId());
             pstm.setInt(3, quiz.getId());
             pstm.execute();
         } catch (SQLException e) {

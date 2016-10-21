@@ -3,13 +3,13 @@
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-class Quiz extends Reference {
+class Quiz extends Reference<Integer> {
 
     private String name;
     private QuizTypes type;
     private User owner;
 
-    Quiz(int id, String name, QuizTypes type, User owner) {
+    Quiz(Integer id, String name, QuizTypes type, User owner) {
         super(id);
         setName(name);
         setType(type);

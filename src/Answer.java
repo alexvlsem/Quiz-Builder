@@ -3,13 +3,13 @@
  *
  * @author Aleksei_Semenov 10/08/16.
  */
-class Answer extends Reference {
+class Answer extends Reference<Integer> {
 
     private String text;
     private boolean correctness;
     private Question question;
 
-    Answer(int id, String text, boolean correctness, Question question) {
+    Answer(Integer id, String text, boolean correctness, Question question) {
         super(id);
         setText(text);
         setCorrectness(correctness);

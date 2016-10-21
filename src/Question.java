@@ -3,14 +3,14 @@
  *
  * @author Aleksei_Semenov 10/08/16.
  */
-class Question extends Reference {
+class Question extends Reference<Integer> {
 
     private String name;
     private String text;
     private boolean multipleChoice;
     private Quiz quiz;
 
-    Question(int id, String name, String text, boolean multipleChoice, Quiz quiz) {
+    Question(Integer id, String name, String text, boolean multipleChoice, Quiz quiz) {
         super(id);
         setName(name);
         setText(text);

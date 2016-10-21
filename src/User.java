@@ -3,28 +3,23 @@
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-class User {
+class User extends Reference<String>{
 
-    private String login;
     private String firstName;
     private String lastName;
 
-    User(String login, String firstName, String lastName) {
-        this.login = login;
+    User(String id, String firstName, String lastName) {
+        super(id);
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
     //Getters
-    private String getFirstName() {
+    public String getFirstName() {
         return firstName;
     }
 
-    String getLogin() {
-        return login;
-    }
-
-    private String getLastName() {
+    public String getLastName() {
         return lastName;
     }
 

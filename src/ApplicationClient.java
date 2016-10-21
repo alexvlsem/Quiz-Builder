@@ -1,9 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
+import java.util.List;
+
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -100,7 +101,8 @@ class ApplicationClient extends JFrame {
     private class YourQuizPanel extends JPanel {
 
         JButton buttonNewQuiz, buttonEditQuiz, buttonDeleteQuiz,
-                buttonAddUsers, buttonRemoveUsers;
+                buttonAddUsers, buttonRemoveUsers, buttonSortUsers,
+                buttonSearchUsers;
         JList<User> listAllUsers, listAssignedToUsers;
 
         JTable table;
@@ -152,11 +154,16 @@ class ApplicationClient extends JFrame {
 
             buttonAddUsers = new JButton(">");
             buttonRemoveUsers = new JButton("<");
+            buttonSortUsers = new JButton(rb.getString("btSort"));
+            buttonSearchUsers = new JButton(rb.getString("btSearch"));
 
             JPanel buttonUserPanel = new JPanel();
-            buttonUserPanel.setLayout(new GridLayout(2, 1));
+            buttonUserPanel.setLayout(new GridLayout(4, 1));
             buttonUserPanel.add(buttonAddUsers);
             buttonUserPanel.add(buttonRemoveUsers);
+            buttonUserPanel.add(buttonSortUsers);
+            buttonUserPanel.add(buttonSearchUsers);
+
 
             JPanel usersPanel = new JPanel();
             usersPanel.add(new JScrollPane(spAllUsers));
@@ -203,15 +210,11 @@ class ApplicationClient extends JFrame {
                 Quiz currQuiz = (Quiz) getTableValue(applicationGUI.yourQuizPanel.table, 1);
 
                 DefaultListModel<User> lm1 = new DefaultListModel<>();
-                for (User u : DataBaseConnector.getUsersForAssignment(currQuiz, true)) {
-                    lm1.addElement(u);
-                }
+                DataBaseConnector.getUsersForAssignment(currQuiz, true).forEach(lm1::addElement);
                 listAllUsers.setModel(lm1);
 
                 DefaultListModel<User> lm2 = new DefaultListModel<>();
-                for (User u : DataBaseConnector.getUsersForAssignment(currQuiz, false)) {
-                    lm2.addElement(u);
-                }
+                DataBaseConnector.getUsersForAssignment(currQuiz, false).forEach(lm2::addElement);
                 listAssignedToUsers.setModel(lm2);
             }
         }
@@ -418,6 +421,8 @@ class ApplicationClient extends JFrame {
             yourQuizPanel.buttonEditQuiz.addActionListener(handler);
             yourQuizPanel.buttonDeleteQuiz.addActionListener(handler);
             yourQuizPanel.buttonAddUsers.addActionListener(handler);
+            yourQuizPanel.buttonSortUsers.addActionListener(handler);
+            yourQuizPanel.buttonSearchUsers.addActionListener(handler);
             yourQuizPanel.buttonRemoveUsers.addActionListener(handler);
             yourQuizPanel.table.getSelectionModel().
                     addListSelectionListener(handler);
@@ -529,6 +534,10 @@ class ApplicationClient extends JFrame {
                     applicationGUI.yourQuizPanel.refreshUserLists();
                     applicationGUI.assignedQuizPanel.refreshTable();
                 }
+            } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonSortUsers) {
+                selectFromPopupMenu(applicationGUI.yourQuizPanel.buttonSortUsers);
+            } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonSearchUsers) {
+                selectFromPopupMenu(applicationGUI.yourQuizPanel.buttonSearchUsers);
             }
         }
 
@@ -555,10 +564,108 @@ class ApplicationClient extends JFrame {
             }
             applicationGUI.yourQuizPanel.refreshUserLists();
         }
+
+        /**
+         * The selectFromPopupMenu method creates a popup menu, sorts the list
+         * of all users or finds a user depending on a calling button and a
+         * selected item of the menu.
+         *
+         * @param button that calls the popup menu
+         */
+        private void selectFromPopupMenu(JButton button) {
+            String[] menuItems = {"First Name", "Last Name", "login"};
+            JPopupMenu popup = new JPopupMenu();
+
+            ActionListener menuListener = new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    //A collection that is sorted or searched
+                    List<User> users = new ArrayList<>();
+                    ListModel<User> model =
+                            applicationGUI.yourQuizPanel.listAllUsers.getModel();
+                    for (int index = 0; index < model.getSize(); index++) {
+                        users.add(model.getElementAt(index));
+                    }
+
+                    //if the users' list is empty then stop the flow
+                    if (users.size() == 0) {
+                        return;
+                    }
+
+                    String attribute = event.getActionCommand();
+                    int commandIndex = Arrays.asList(menuItems).indexOf(attribute);
+                    //Creates a comparator
+                    Comparator<User> comparator = new Comparator<User>() {
+                        @Override
+                        public int compare(User o1, User o2) {
+                            switch (commandIndex) {
+                                case 0:
+                                    return o1.getFirstName().compareTo(o2.getFirstName());
+                                case 1:
+                                    return o1.getLastName().compareTo(o2.getLastName());
+                                default:
+                                    return o1.getId().compareTo(o2.getId());
+                            }
+                        }
+                    };
+
+                    //Sorts the users' collection
+                    Collections.sort(users, comparator);
+
+                    if (button == applicationGUI.yourQuizPanel.buttonSearchUsers) {
+
+                        String searchValue = JOptionPane.showInputDialog(applicationGUI,
+                                "Enter the " + attribute);
+
+                        User searchingUser;
+                        switch (commandIndex) {
+                            case 0:
+                                searchingUser = new User(null, searchValue, null);
+                                break;
+                            case 1:
+                                searchingUser = new User(null, null, searchValue);
+                                break;
+                            default:
+                                searchingUser = new User(searchValue, null, null);
+                                break;
+                        }
+
+                        //Searches the user in the collection
+                        int index = Collections.binarySearch(users, searchingUser, comparator);
+
+                        if (index >= 0) { //if a user is found then selects him in the list
+                            searchingUser = users.get(index);
+                            applicationGUI.yourQuizPanel.listAllUsers.
+                                    setSelectedIndex(((DefaultListModel<User>) model).
+                                            indexOf(searchingUser));
+                        }
+
+                    } else if (button == applicationGUI.yourQuizPanel.buttonSortUsers) {
+                        //Fills the list with the sorted collection
+                        DefaultListModel<User> lm = new DefaultListModel<>();
+                        users.forEach(lm::addElement);
+                        applicationGUI.yourQuizPanel.listAllUsers.setModel(lm);
+                    }
+
+                }
+            };
+
+            //Fills the menu
+            JMenuItem item;
+            for (String itemName : menuItems) {
+                popup.add(item = new JMenuItem(itemName));
+                item.setHorizontalTextPosition(JMenuItem.RIGHT);
+                item.addActionListener(menuListener);
+            }
+            popup.setBorder(new BevelBorder(BevelBorder.RAISED));
+            //Shows menu under the button
+            popup.show(button, (int) button.getAlignmentX(),
+                    (int) button.getAlignmentY() + button.getHeight());
+        }
     }
 
     /**
-     * The fieldIsCorrect method checks that the value is not empty and does't exceed max length.
+     * The fieldIsCorrect method checks that the value is not empty and does't
+     * exceed max length.
      *
      * @param string    the checked value.
      * @param maxLength max length of the checked value.
@@ -571,8 +678,8 @@ class ApplicationClient extends JFrame {
         if (string.length() > 0 && string.length() <= maxLength) {
             return true;
         } else {
-            JOptionPane.showMessageDialog(null, fieldName +
-                            rb.getString("msCheckValue4") +
+            JOptionPane.showMessageDialog(null,
+                    fieldName + rb.getString("msCheckValue4") +
                             maxLength + rb.getString("msCheckValue2"),
                     rb.getString("msCheckValue3"),
                     JOptionPane.ERROR_MESSAGE);

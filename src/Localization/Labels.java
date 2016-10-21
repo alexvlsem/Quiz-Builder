@@ -47,6 +47,8 @@ public class Labels extends ListResourceBundle {
                 {"btNew", "New"},
                 {"btEdit", "Edit"},
                 {"btDelete", "Delete"},
+                {"btSort", "Sort by..."},
+                {"btSearch", "Search by..."},
                 {"tlAllUsers", "All users"},
                 {"tlAssignedTo", "Assigned to"},
                 {"tlDate", "Date"},
