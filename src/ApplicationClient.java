@@ -65,7 +65,7 @@ class ApplicationClient extends JFrame {
             //Puts text area to a scroll pane and add a title to the scroll pane
             JScrollPane scrollPaneNewResponses = new JScrollPane(textNewResponses);
             scrollPaneNewResponses.setBorder(BorderFactory.
-                    createTitledBorder(rb.getString("tlNewResponses")));
+                createTitledBorder(rb.getString("tlNewResponses")));
 
             //Puts a scroll pane and a button to a flat panel
             JPanel panelNewResponses = new JPanel();
@@ -75,7 +75,7 @@ class ApplicationClient extends JFrame {
             //Puts text area to a scroll pane and add a title to the scroll pane
             JScrollPane scrollUncompletedQuizes = new JScrollPane(textUncompletedQuizes);
             scrollUncompletedQuizes.setBorder(BorderFactory.
-                    createTitledBorder(rb.getString("tlUncompletedQuizzes")));
+                createTitledBorder(rb.getString("tlUncompletedQuizzes")));
 
             //Puts a scroll pane and a button to a flat panel
             JPanel panelUncompletedQuizes = new JPanel();
@@ -101,8 +101,8 @@ class ApplicationClient extends JFrame {
     private class YourQuizPanel extends JPanel {
 
         JButton buttonNewQuiz, buttonEditQuiz, buttonDeleteQuiz,
-                buttonAddUsers, buttonRemoveUsers, buttonSortUsers,
-                buttonSearchUsers;
+            buttonAddUsers, buttonRemoveUsers, buttonSortUsers,
+            buttonSearchUsers;
         JList<User> listAllUsers, listAssignedToUsers;
 
         JTable table;
@@ -146,9 +146,9 @@ class ApplicationClient extends JFrame {
             JScrollPane spAllUsers = new JScrollPane(listAllUsers);
             JScrollPane spAssignUsers = new JScrollPane(listAssignedToUsers);
             spAllUsers.setBorder(BorderFactory.createTitledBorder(
-                    rb.getString("tlAllUsers")));
+                rb.getString("tlAllUsers")));
             spAssignUsers.setBorder(BorderFactory.createTitledBorder(
-                    rb.getString("tlAssignedTo")));
+                rb.getString("tlAssignedTo")));
             spAllUsers.setPreferredSize(new Dimension(250, 120));
             spAssignUsers.setPreferredSize(new Dimension(250, 120));
 
@@ -178,8 +178,8 @@ class ApplicationClient extends JFrame {
         void formatTable() {
 
             assert (table != null) : "The variable table in the instance of " +
-                    "the inner YourQuizPanel class " +
-                    "of the ApplicationClient class is null";
+                "the inner YourQuizPanel class " +
+                "of the ApplicationClient class is null";
 
             table.getColumn(rb.getString("tlNumber")).setMaxWidth(50);
             table.getColumn(rb.getString("tlQuizName")).setPreferredWidth(200);
@@ -188,6 +188,7 @@ class ApplicationClient extends JFrame {
                 Class<?> col_class = table.getColumnClass(c);
                 table.setDefaultEditor(col_class, null);        // remove editor
             }
+            table.setAutoCreateRowSorter(true);
         }
 
         void refreshQuizTable() {
@@ -241,7 +242,7 @@ class ApplicationClient extends JFrame {
 
             //Creates new table and adds it to the scroll pane
             dm = new DefaultTableModel(
-                    DataBaseConnector.getCompletedQuizzes(user), headings);
+                DataBaseConnector.getCompletedQuizzes(user), headings);
             table = new JTable(dm);
             formatTable();
 
@@ -284,6 +285,7 @@ class ApplicationClient extends JFrame {
                 Class<?> col_class = table.getColumnClass(c);
                 table.setDefaultEditor(col_class, null);        // remove editor
             }
+            table.setAutoCreateRowSorter(true);
         }
 
         void refreshInfo() {
@@ -298,8 +300,8 @@ class ApplicationClient extends JFrame {
             String info = rb.getString("msInfo5");
             if (newResponses > 0) {
                 info = rb.getString("msInfo2") + newResponses +
-                        rb.getString("msInfo6") +
-                        (newResponses > 1 ? rb.getString("msInfo7") : "");
+                    rb.getString("msInfo6") +
+                    (newResponses > 1 ? rb.getString("msInfo7") : "");
             }
             applicationGUI.mainPanel.textNewResponses.setText(info);
         }
@@ -327,7 +329,7 @@ class ApplicationClient extends JFrame {
 
             //Creates new table and adds it to the scroll pane
             dm = new DefaultTableModel(
-                    DataBaseConnector.getAssignedQuizzes(user), headings);
+                DataBaseConnector.getAssignedQuizzes(user), headings);
             table = new JTable(dm);
             formatTable();
 
@@ -357,13 +359,14 @@ class ApplicationClient extends JFrame {
                 Class<?> col_class = table.getColumnClass(c);
                 table.setDefaultEditor(col_class, null);        // remove editor
             }
+            table.setAutoCreateRowSorter(true);
         }
 
         void refreshTable() {
 
             int currRow = table.getSelectedRow();
             dm.setDataVector(
-                    DataBaseConnector.getAssignedQuizzes(user), headings);
+                DataBaseConnector.getAssignedQuizzes(user), headings);
 
             formatTable();
             refreshInfo();
@@ -384,7 +387,7 @@ class ApplicationClient extends JFrame {
             String info = rb.getString("msInfo1");
             if (newQuizzes > 0) {
                 info = rb.getString("msInfo2") + newQuizzes + rb.getString("msInfo3")
-                        + (newQuizzes > 1 ? rb.getString("msInfo4") : "");
+                    + (newQuizzes > 1 ? rb.getString("msInfo4") : "");
             }
             applicationGUI.mainPanel.textUncompletedQuizes.setText(info);
         }
@@ -410,7 +413,7 @@ class ApplicationClient extends JFrame {
             responsesPanel = new ResponsesPanel();
             assignedQuizPanel = new AssignedQuizPanel();
             profileAction = new JComboBox<>(new String[]{user.toString(),
-                    rb.getString("tlChangeUser")});
+                rb.getString("tlChangeUser")});
 
             handler = new ApplicationHandler();
 
@@ -425,7 +428,7 @@ class ApplicationClient extends JFrame {
             yourQuizPanel.buttonSearchUsers.addActionListener(handler);
             yourQuizPanel.buttonRemoveUsers.addActionListener(handler);
             yourQuizPanel.table.getSelectionModel().
-                    addListSelectionListener(handler);
+                addListSelectionListener(handler);
             responsesPanel.buttonCreateReport.addActionListener(handler);
             assignedQuizPanel.buttonStartQuiz.addActionListener(handler);
 
@@ -441,6 +444,7 @@ class ApplicationClient extends JFrame {
             setLayout(new BorderLayout());
             add(actionWrapper, BorderLayout.NORTH);
             add(tabbedPane, BorderLayout.CENTER);
+
         }
     }
 
@@ -448,8 +452,8 @@ class ApplicationClient extends JFrame {
      * The inner ApplicationHandler class handles all events of the ApplicationClient instance.
      */
     private class ApplicationHandler
-            extends WindowAdapter
-            implements ActionListener, ItemListener, ListSelectionListener {
+        extends WindowAdapter
+        implements ActionListener, ItemListener, ListSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -464,7 +468,7 @@ class ApplicationClient extends JFrame {
                 Object currQuiz = getTableValue(applicationGUI.responsesPanel.table, 2);
                 if (currRespondent == null || currQuiz == null) {
                     JOptionPane.showMessageDialog(
-                            ApplicationClient.this, rb.getString("msSelectTheResponse"));
+                        ApplicationClient.this, rb.getString("msSelectTheResponse"));
                     return;
                 }
                 new ReportClient(ApplicationClient.this, (User) currRespondent, (Quiz) currQuiz);
@@ -475,14 +479,16 @@ class ApplicationClient extends JFrame {
                 }
 
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonNewQuiz) {
+
                 new QuizEditingClient(ApplicationClient.this, new Quiz(0, null, null, user));
                 applicationGUI.yourQuizPanel.refreshQuizTable();
+
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonEditQuiz) {
 
                 Object currQuiz = getTableValue(applicationGUI.yourQuizPanel.table, 1);
                 if (currQuiz == null) {
                     JOptionPane.showMessageDialog(ApplicationClient.this,
-                            rb.getString("msSelectTheQuiz"));
+                        rb.getString("msSelectTheQuiz"));
                     return;
                 }
                 new QuizEditingClient(ApplicationClient.this, (Quiz) currQuiz);
@@ -492,11 +498,11 @@ class ApplicationClient extends JFrame {
                 Object currQuiz = getTableValue(applicationGUI.yourQuizPanel.table, 1);
                 if (currQuiz == null) {
                     JOptionPane.showMessageDialog(ApplicationClient.this,
-                            rb.getString("msSelectTheQuiz"));
+                        rb.getString("msSelectTheQuiz"));
                 } else {
                     if (!DataBaseConnector.deleteReference((Quiz) currQuiz)) {
                         JOptionPane.showMessageDialog(ApplicationClient.this,
-                                rb.getString("msQuizCantBeRemoved"));
+                            rb.getString("msQuizCantBeRemoved"));
                     } else {
                         applicationGUI.yourQuizPanel.refreshQuizTable();
                     }
@@ -506,31 +512,35 @@ class ApplicationClient extends JFrame {
                 Object currQuiz = getTableValue(applicationGUI.assignedQuizPanel.table, 2);
                 if (currQuiz == null) {
                     JOptionPane.showMessageDialog(ApplicationClient.this,
-                            rb.getString("msSelectTheQuiz"));
+                        rb.getString("msSelectTheQuiz"));
                     return;
                 } else if ((boolean) getTableValue(applicationGUI.assignedQuizPanel.table, 5)) {
                     JOptionPane.showMessageDialog(ApplicationClient.this,
-                            rb.getString("msQuizIsCompleted"));
+                        rb.getString("msQuizIsCompleted"));
                     return;
                 }
                 new QuizTakingClient(ApplicationClient.this, (Quiz) currQuiz, user);
                 applicationGUI.assignedQuizPanel.refreshTable();
 
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonAddUsers) {
+
                 ArrayList<User> userList = new ArrayList<>(
-                        applicationGUI.yourQuizPanel.listAllUsers.getSelectedValuesList());
+                    applicationGUI.yourQuizPanel.listAllUsers.getSelectedValuesList());
+
                 if (userList.size() > 0) {
                     DataBaseConnector.assignQuizToUsers(userList,
-                            (Quiz) getTableValue(applicationGUI.yourQuizPanel.table, 1));
+                        (Quiz) getTableValue(applicationGUI.yourQuizPanel.table, 1));
                     applicationGUI.yourQuizPanel.refreshUserLists();
                     applicationGUI.assignedQuizPanel.refreshTable();
                 }
             } else if (e.getSource() == applicationGUI.yourQuizPanel.buttonRemoveUsers) {
+
                 ArrayList<User> userList = new ArrayList<>(
-                        applicationGUI.yourQuizPanel.listAssignedToUsers.getSelectedValuesList());
+                    applicationGUI.yourQuizPanel.listAssignedToUsers.getSelectedValuesList());
+
                 if (userList.size() > 0) {
                     DataBaseConnector.removeQuizFromUsers(userList,
-                            (Quiz) getTableValue(applicationGUI.yourQuizPanel.table, 1));
+                        (Quiz) getTableValue(applicationGUI.yourQuizPanel.table, 1));
                     applicationGUI.yourQuizPanel.refreshUserLists();
                     applicationGUI.assignedQuizPanel.refreshTable();
                 }
@@ -546,7 +556,7 @@ class ApplicationClient extends JFrame {
 
             if (e.getSource() == applicationGUI.profileAction) {
                 if (e.getStateChange() == ItemEvent.SELECTED &&
-                        applicationGUI.profileAction.getSelectedIndex() == 1) {
+                    applicationGUI.profileAction.getSelectedIndex() == 1) {
                     new LoginClient();
                     dispose();
                 }
@@ -573,7 +583,8 @@ class ApplicationClient extends JFrame {
          * @param button that calls the popup menu
          */
         private void selectFromPopupMenu(JButton button) {
-            String[] menuItems = {"First Name", "Last Name", "login"};
+            String[] menuItems = {rb.getString("lbFirstName"),
+                rb.getString("lbLastName"), rb.getString("lbLogin")};
             JPopupMenu popup = new JPopupMenu();
 
             ActionListener menuListener = new ActionListener() {
@@ -581,7 +592,7 @@ class ApplicationClient extends JFrame {
                     //A collection that is sorted or searched
                     List<User> users = new ArrayList<>();
                     ListModel<User> model =
-                            applicationGUI.yourQuizPanel.listAllUsers.getModel();
+                        applicationGUI.yourQuizPanel.listAllUsers.getModel();
                     for (int index = 0; index < model.getSize(); index++) {
                         users.add(model.getElementAt(index));
                     }
@@ -614,7 +625,10 @@ class ApplicationClient extends JFrame {
                     if (button == applicationGUI.yourQuizPanel.buttonSearchUsers) {
 
                         String searchValue = JOptionPane.showInputDialog(applicationGUI,
-                                "Enter the " + attribute);
+                            rb.getString("tlEnterTheValue") + attribute);
+                        if (searchValue == null) {
+                            return; //the enter was canceled
+                        }
 
                         User searchingUser;
                         switch (commandIndex) {
@@ -635,8 +649,8 @@ class ApplicationClient extends JFrame {
                         if (index >= 0) { //if a user is found then selects him in the list
                             searchingUser = users.get(index);
                             applicationGUI.yourQuizPanel.listAllUsers.
-                                    setSelectedIndex(((DefaultListModel<User>) model).
-                                            indexOf(searchingUser));
+                                setSelectedIndex(((DefaultListModel<User>) model).
+                                    indexOf(searchingUser));
                         }
 
                     } else if (button == applicationGUI.yourQuizPanel.buttonSortUsers) {
@@ -659,7 +673,7 @@ class ApplicationClient extends JFrame {
             popup.setBorder(new BevelBorder(BevelBorder.RAISED));
             //Shows menu under the button
             popup.show(button, (int) button.getAlignmentX(),
-                    (int) button.getAlignmentY() + button.getHeight());
+                (int) button.getAlignmentY() + button.getHeight());
         }
     }
 
@@ -679,10 +693,10 @@ class ApplicationClient extends JFrame {
             return true;
         } else {
             JOptionPane.showMessageDialog(null,
-                    fieldName + rb.getString("msCheckValue4") +
-                            maxLength + rb.getString("msCheckValue2"),
-                    rb.getString("msCheckValue3"),
-                    JOptionPane.ERROR_MESSAGE);
+                fieldName + rb.getString("msCheckValue4") +
+                    maxLength + rb.getString("msCheckValue2"),
+                rb.getString("msCheckValue3"),
+                JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }

@@ -15,11 +15,11 @@ class DataBaseConnector {
 
         if (conn == null) {
             String connectionUrl = String.format(
-                    "jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;",
-                    LoginClient.getSettings().getServer(),
-                    LoginClient.getSettings().getDatabase(),
-                    LoginClient.getSettings().getLogin(),
-                    new String(LoginClient.getSettings().getPassword()));
+                "jdbc:sqlserver://%s;databaseName=%s;user=%s;password=%s;",
+                LoginClient.getSettings().getServer(),
+                LoginClient.getSettings().getDatabase(),
+                LoginClient.getSettings().getLogin(),
+                new String(LoginClient.getSettings().getPassword()));
             try {
                 conn = DriverManager.getConnection(connectionUrl);
                 prepareDatabase();
@@ -74,15 +74,15 @@ class DataBaseConnector {
      * The createUsersTable method creates a table to store records about users.
      */
     private static void createUsersTable(
-            DatabaseMetaData dbmd, Statement stmt) throws SQLException {
+        DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Users", null);
         if (!tables.next()) {
 
             String sql = "CREATE TABLE Users " +
-                    "(login     NVARCHAR(25)  NOT NULL PRIMARY KEY, " +
-                    " firstName NVARCHAR(50) NOT NULL, " +
-                    " lastName  NVARCHAR(50) NOT NULL, " +
-                    " password  NVARCHAR(8))";
+                "(login     NVARCHAR(25)  NOT NULL PRIMARY KEY, " +
+                " firstName NVARCHAR(50) NOT NULL, " +
+                " lastName  NVARCHAR(50) NOT NULL, " +
+                " password  NVARCHAR(8))";
 
             stmt.executeUpdate(sql);
         }
@@ -92,14 +92,14 @@ class DataBaseConnector {
      * The createQuizzesTable method creates a table to store records about quizzes.
      */
     private static void createQuizzesTable(
-            DatabaseMetaData dbmd, Statement stmt) throws SQLException {
+        DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Quizzes", null);
         if (!tables.next()) {
             String sql = "CREATE TABLE Quizzes " +
-                    "(id        INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
-                    " name      NVARCHAR(255) NOT NULL ," +
-                    " type      NVARCHAR(25) NOT NULL ," +
-                    " ownerId   NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login))";
+                "(id        INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
+                " name      NVARCHAR(255) NOT NULL ," +
+                " type      NVARCHAR(25) NOT NULL ," +
+                " ownerId   NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login))";
 
             stmt.executeUpdate(sql);
         }
@@ -109,15 +109,15 @@ class DataBaseConnector {
      * The createQuestionsTable method creates a table to store records about questions.
      */
     private static void createQuestionsTable(
-            DatabaseMetaData dbmd, Statement stmt) throws SQLException {
+        DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Questions", null);
         if (!tables.next()) {
             String sql = "CREATE TABLE Questions " +
-                    "(id             INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
-                    " name           NVARCHAR(255) NOT NULL ," +
-                    " text           NVARCHAR(2000) NOT NULL ," +
-                    " multipleChoice BIT NOT NULL," +
-                    " quizId         INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id))";
+                "(id             INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
+                " name           NVARCHAR(255) NOT NULL ," +
+                " text           NVARCHAR(2000) NOT NULL ," +
+                " multipleChoice BIT NOT NULL," +
+                " quizId         INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id))";
 
             stmt.executeUpdate(sql);
         }
@@ -127,14 +127,14 @@ class DataBaseConnector {
      * The createAnswersTable method creates a table to store records about answers.
      */
     private static void createAnswersTable(
-            DatabaseMetaData dbmd, Statement stmt) throws SQLException {
+        DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "Answers", null);
         if (!tables.next()) {
             String sql = "CREATE TABLE Answers " +
-                    "(id          INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
-                    " text        NVARCHAR(2000) NOT NULL ," +
-                    " correctness BIT NOT NULL," +
-                    " questionId  INTEGER NOT NULL FOREIGN KEY REFERENCES Questions(id))";
+                "(id          INTEGER IDENTITY(1,1) NOT NULL PRIMARY KEY, " +
+                " text        NVARCHAR(2000) NOT NULL ," +
+                " correctness BIT NOT NULL," +
+                " questionId  INTEGER NOT NULL FOREIGN KEY REFERENCES Questions(id))";
 
             stmt.executeUpdate(sql);
         }
@@ -145,16 +145,16 @@ class DataBaseConnector {
      * assigned to users quizzes and completed by users quizzes.
      */
     private static void createAssignedQuizzesTable(
-            DatabaseMetaData dbmd, Statement stmt) throws SQLException {
+        DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "AssignedQuizzes", null);
         if (!tables.next()) {
             String sql = "CREATE TABLE AssignedQuizzes " +
-                    "(userId        NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
-                    " quizId        INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id)," +
-                    " assignDate    DATETIME NOT NULL ," +
-                    " quizCompleted BIT NOT NULL," +
-                    " completeDate  DATETIME," +
-                    " resultViewed  BIT NOT NULL)";
+                "(userId        NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
+                " quizId        INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id)," +
+                " assignDate    DATETIME NOT NULL ," +
+                " quizCompleted BIT NOT NULL," +
+                " completeDate  DATETIME," +
+                " resultViewed  BIT NOT NULL)";
 
             stmt.executeUpdate(sql);
         }
@@ -165,15 +165,15 @@ class DataBaseConnector {
      * the users' answers.
      */
     private static void createQuizResponsesTable(
-            DatabaseMetaData dbmd, Statement stmt) throws SQLException {
+        DatabaseMetaData dbmd, Statement stmt) throws SQLException {
         ResultSet tables = dbmd.getTables(null, null, "QuizResponses", null);
         if (!tables.next()) {
             String sql = "CREATE TABLE QuizResponses " +
-                    "(respondentId NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
-                    " quizId       INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id)," +
-                    " questionId   INTEGER NOT NULL FOREIGN KEY REFERENCES Questions(id)," +
-                    " answerId     INTEGER NOT NULL FOREIGN KEY REFERENCES Answers(id)," +
-                    " isSelected   BIT NOT NULL)";
+                "(respondentId NVARCHAR(25) NOT NULL FOREIGN KEY REFERENCES Users(login)," +
+                " quizId       INTEGER NOT NULL FOREIGN KEY REFERENCES Quizzes(id)," +
+                " questionId   INTEGER NOT NULL FOREIGN KEY REFERENCES Questions(id)," +
+                " answerId     INTEGER NOT NULL FOREIGN KEY REFERENCES Answers(id)," +
+                " isSelected   BIT NOT NULL)";
 
             stmt.executeUpdate(sql);
         }
@@ -188,10 +188,10 @@ class DataBaseConnector {
 
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery("SELECT " +
-                    "firstName, " +
-                    "lastName " +
-                    "FROM Users " +
-                    "WHERE login='" + prm[0] + "' AND password= '" + prm[1] + "'");
+                "firstName, " +
+                "lastName " +
+                "FROM Users " +
+                "WHERE login='" + prm[0] + "' AND password= '" + prm[1] + "'");
             if (rs.next()) {
                 userData.add(rs.getString(1));
                 userData.add(rs.getString(2));
@@ -213,15 +213,15 @@ class DataBaseConnector {
 
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(
-                    "SELECT firstName, lastName FROM Users WHERE login='" + prm[0] + "'");
+                "SELECT firstName, lastName FROM Users WHERE login='" + prm[0] + "'");
             if (rs.next()) {
                 userData.add(LoginClient.getRb().getString("msLoginIsBeenUsed"));
             } else {
                 stmt.executeUpdate("INSERT INTO Users (login, firstName, lastName, password) " +
-                        "VALUES ( '" + prm[0] + "'," +
-                        " '" + prm[1] + "'," +
-                        " '" + prm[2] + "'," +
-                        " '" + prm[3] + "')");
+                    "VALUES ( '" + prm[0] + "'," +
+                    " '" + prm[1] + "'," +
+                    " '" + prm[2] + "'," +
+                    " '" + prm[3] + "')");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -291,7 +291,7 @@ class DataBaseConnector {
 
                 row.add(++num);
                 Quiz quiz = new Quiz(rs.getInt("id"), rs.getString("name"),
-                        QuizTypes.valueOf(rs.getString("type")), user);
+                    QuizTypes.valueOf(rs.getString("type")), user);
 
                 row.add(quiz);
                 row.add(quiz.getType());
@@ -368,11 +368,11 @@ class DataBaseConnector {
                 Vector<Object> row = new Vector<>();
                 row.add(++num);
                 Question question = new Question(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("text"),
-                        rs.getBoolean("multipleChoice"),
-                        quiz);
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("text"),
+                    rs.getBoolean("multipleChoice"),
+                    quiz);
                 row.add(question);
                 row.add(question.getText());
                 row.add(question.getMultipleChoice());
@@ -396,10 +396,10 @@ class DataBaseConnector {
         if (answer.getId() == 0) {
 
             String query = "INSERT INTO Answers (text, correctness, questionId) " +
-                    "VALUES (?, ?, ?)";
+                "VALUES (?, ?, ?)";
 
             try (PreparedStatement pstm = conn.prepareStatement(query,
-                    Statement.RETURN_GENERATED_KEYS)) {
+                Statement.RETURN_GENERATED_KEYS)) {
                 pstm.setString(1, answer.getText());
                 pstm.setBoolean(2, answer.getCorrectness());
                 pstm.setInt(3, answer.getQuestion().getId());
@@ -449,10 +449,10 @@ class DataBaseConnector {
                 Vector<Object> row = new Vector<>();
                 row.add(++num);
                 Answer answer = new Answer(
-                        rs.getInt("id"),
-                        rs.getString("text"),
-                        rs.getBoolean("correctness"),
-                        question);
+                    rs.getInt("id"),
+                    rs.getString("text"),
+                    rs.getBoolean("correctness"),
+                    question);
                 row.add(answer);
                 row.add(answer.getCorrectness());
 
@@ -480,10 +480,10 @@ class DataBaseConnector {
 
         if (inclusive) {
             query = "SELECT * FROM Users WHERE login NOT IN " +
-                    "(SELECT userId FROM AssignedQuizzes WHERE quizId =?)";
+                "(SELECT userId FROM AssignedQuizzes WHERE quizId =?)";
         } else {
             query = "SELECT * FROM Users WHERE login IN " +
-                    "(SELECT userId FROM AssignedQuizzes WHERE quizId =? AND quizCompleted =?)";
+                "(SELECT userId FROM AssignedQuizzes WHERE quizId =? AND quizCompleted =?)";
         }
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
@@ -512,7 +512,7 @@ class DataBaseConnector {
     static void assignQuizToUsers(ArrayList<User> users, Quiz quiz) {
 
         String query = "INSERT INTO AssignedQuizzes (userId, quizId, assignDate, quizCompleted, resultViewed ) " +
-                " VALUES (?, ?, ?, ?, ?);";
+            " VALUES (?, ?, ?, ?, ?);";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
 
@@ -567,17 +567,17 @@ class DataBaseConnector {
         Vector<Object> rows = new Vector<>();
 
         String query = "SELECT Users.login AS authorId, " +
-                "Users.firstName AS authorFirstName, " +
-                "Users.lastName  AS authorLastName, " +
-                "Quizzes.id AS quizID, " +
-                "Quizzes.name AS quizName, " +
-                "Quizzes.type AS quizType," +
-                "AssignedQuizzes.assignDate," +
-                "AssignedQuizzes.quizCompleted  " +
-                "FROM AssignedQuizzes  \n" +
-                "INNER JOIN Quizzes ON Quizzes.id=AssignedQuizzes.quizId\n" +
-                "INNER JOIN Users ON Users.login=Quizzes.ownerId\n" +
-                "WHERE AssignedQuizzes.userId =?";
+            "Users.firstName AS authorFirstName, " +
+            "Users.lastName  AS authorLastName, " +
+            "Quizzes.id AS quizID, " +
+            "Quizzes.name AS quizName, " +
+            "Quizzes.type AS quizType," +
+            "AssignedQuizzes.assignDate," +
+            "AssignedQuizzes.quizCompleted  " +
+            "FROM AssignedQuizzes  \n" +
+            "INNER JOIN Quizzes ON Quizzes.id=AssignedQuizzes.quizId\n" +
+            "INNER JOIN Users ON Users.login=Quizzes.ownerId\n" +
+            "WHERE AssignedQuizzes.userId =?";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setString(1, user.getId());
@@ -589,14 +589,14 @@ class DataBaseConnector {
                 row.add(++num);
                 row.add(rs.getDate("assignDate"));
                 User author = new User(
-                        rs.getString("authorId"),
-                        rs.getString("authorFirstName"),
-                        rs.getString("authorLastName"));
+                    rs.getString("authorId"),
+                    rs.getString("authorFirstName"),
+                    rs.getString("authorLastName"));
                 Quiz quiz = new Quiz(
-                        rs.getInt("quizID"),
-                        rs.getString("quizName"),
-                        QuizTypes.valueOf(rs.getString("quizType")),
-                        author);
+                    rs.getInt("quizID"),
+                    rs.getString("quizName"),
+                    QuizTypes.valueOf(rs.getString("quizType")),
+                    author);
                 row.add(quiz);
                 row.add(author);
                 row.add(quiz.getType());
@@ -619,10 +619,10 @@ class DataBaseConnector {
     static void saveResponses(Vector rows, User respondent) {
 
         String queryDel = "DELETE FROM QuizResponses " +
-                "WHERE respondentId=? AND answerId=?";
+            "WHERE respondentId=? AND answerId=?";
         String queryAdd = "INSERT INTO QuizResponses " +
-                "(respondentId, quizId, questionId, answerId, isSelected) " +
-                " VALUES (?, ?, ?, ?, ?)";
+            "(respondentId, quizId, questionId, answerId, isSelected) " +
+            " VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmDel = conn.prepareStatement(queryDel);
              PreparedStatement pstmAdd = conn.prepareStatement(queryAdd)) {
@@ -668,20 +668,20 @@ class DataBaseConnector {
         Vector<Object> rows = new Vector<>();
 
         String query = "SELECT\n" +
-                "  Answers.id,\n" +
-                "  Answers.text,\n" +
-                "  Answers.correctness,\n" +
-                "  Responses.isSelected\n" +
-                "FROM Answers\n" +
-                "  LEFT JOIN\n" +
-                "  (SELECT\n" +
-                "     QuizResponses.isSelected,\n" +
-                "     QuizResponses.answerId\n" +
-                "   FROM QuizResponses\n" +
-                "   WHERE QuizResponses.respondentId = ?) AS Responses\n" +
-                "    ON Answers.id = Responses.answerId\n" +
-                "WHERE Answers.questionId = ?\n" +
-                "ORDER BY Answers.id";
+            "  Answers.id,\n" +
+            "  Answers.text,\n" +
+            "  Answers.correctness,\n" +
+            "  Responses.isSelected\n" +
+            "FROM Answers\n" +
+            "  LEFT JOIN\n" +
+            "  (SELECT\n" +
+            "     QuizResponses.isSelected,\n" +
+            "     QuizResponses.answerId\n" +
+            "   FROM QuizResponses\n" +
+            "   WHERE QuizResponses.respondentId = ?) AS Responses\n" +
+            "    ON Answers.id = Responses.answerId\n" +
+            "WHERE Answers.questionId = ?\n" +
+            "ORDER BY Answers.id";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
 
@@ -694,10 +694,10 @@ class DataBaseConnector {
                 Vector<Object> row = new Vector<>();
                 row.add(++num);
                 Answer answer = new Answer(
-                        rs.getInt("id"),
-                        rs.getString("text"),
-                        rs.getBoolean("correctness"),
-                        question);
+                    rs.getInt("id"),
+                    rs.getString("text"),
+                    rs.getBoolean("correctness"),
+                    question);
                 row.add(answer);
                 row.add(rs.getBoolean("isSelected"));
                 rows.add(row);
@@ -717,8 +717,8 @@ class DataBaseConnector {
      */
     static void finishQuiz(User respondent, Quiz quiz) {
         String query = "UPDATE AssignedQuizzes \n" +
-                "SET AssignedQuizzes.completeDate=?, AssignedQuizzes.quizCompleted=? \n" +
-                "WHERE AssignedQuizzes.quizId=? AND AssignedQuizzes.userId= ?";
+            "SET AssignedQuizzes.completeDate=?, AssignedQuizzes.quizCompleted=? \n" +
+            "WHERE AssignedQuizzes.quizId=? AND AssignedQuizzes.userId= ?";
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setDate(1, new Date(System.currentTimeMillis()));
             pstm.setBoolean(2, true);
@@ -745,18 +745,18 @@ class DataBaseConnector {
         Vector<Object> rows = new Vector<>();
 
         String query = "SELECT\n" +
-                "  AssignedQuizzes.userId,\n" +
-                "  AssignedQuizzes.quizId,\n" +
-                "  AssignedQuizzes.completeDate,\n" +
-                "  AssignedQuizzes.resultViewed,\n" +
-                "  Quizzes.name AS quizName,\n" +
-                "  Quizzes.type AS quizType,\n" +
-                "  Users.firstName,\n" +
-                "  Users.lastName\n" +
-                "FROM AssignedQuizzes\n" +
-                "INNER JOIN Quizzes ON AssignedQuizzes.quizId = Quizzes.id\n" +
-                "INNER JOIN Users ON AssignedQuizzes.userId = Users.login\n" +
-                "WHERE Quizzes.ownerId = ? AND AssignedQuizzes.quizCompleted = ?";
+            "  AssignedQuizzes.userId,\n" +
+            "  AssignedQuizzes.quizId,\n" +
+            "  AssignedQuizzes.completeDate,\n" +
+            "  AssignedQuizzes.resultViewed,\n" +
+            "  Quizzes.name AS quizName,\n" +
+            "  Quizzes.type AS quizType,\n" +
+            "  Users.firstName,\n" +
+            "  Users.lastName\n" +
+            "FROM AssignedQuizzes\n" +
+            "INNER JOIN Quizzes ON AssignedQuizzes.quizId = Quizzes.id\n" +
+            "INNER JOIN Users ON AssignedQuizzes.userId = Users.login\n" +
+            "WHERE Quizzes.ownerId = ? AND AssignedQuizzes.quizCompleted = ?";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setString(1, user.getId());
@@ -768,14 +768,14 @@ class DataBaseConnector {
 
                 row.add(rs.getDate("completeDate"));
                 User respondent = new User(
-                        rs.getString("userId"),
-                        rs.getString("firstName"),
-                        rs.getString("lastName"));
+                    rs.getString("userId"),
+                    rs.getString("firstName"),
+                    rs.getString("lastName"));
                 Quiz quiz = new Quiz(
-                        rs.getInt("quizId"),
-                        rs.getString("quizName"),
-                        QuizTypes.valueOf(rs.getString("quizType")),
-                        user);
+                    rs.getInt("quizId"),
+                    rs.getString("quizName"),
+                    QuizTypes.valueOf(rs.getString("quizType")),
+                    user);
                 row.add(respondent);
                 row.add(quiz);
                 row.add(quiz.getType());
@@ -801,33 +801,33 @@ class DataBaseConnector {
         Vector<Object> rows = new Vector<>();
 
         String query = "SELECT\n" +
-                "  Questions.id AS questionId,\n" +
-                "  Questions.name AS questionName,\n" +
-                "  Questions.text AS questionText,\n" +
-                "  Questions.multipleChoice AS multipleChoice,\n" +
-                "  tbAnswers.id AS answerId,\n" +
-                "  tbAnswers.text AS answerText,\n" +
-                "  tbAnswers.correctness AS correctAnswer,\n" +
-                "  tbAnswers.isSelected AS selectedAnswer\n" +
-                "FROM  Questions\n" +
-                "INNER JOIN\n" +
-                "(SELECT\n" +
-                "  Answers.questionId,\n" +
-                "  Answers.id,\n" +
-                "  Answers.text,\n" +
-                "  Answers.correctness,\n" +
-                "  Responses.isSelected\n" +
-                "FROM Answers\n" +
-                "  LEFT JOIN\n" +
-                "  (SELECT\n" +
-                "   QuizResponses.isSelected,\n" +
-                "     QuizResponses.answerId\n" +
-                "   FROM QuizResponses\n" +
-                "   WHERE QuizResponses.respondentId = ?) AS Responses\n" +
-                "    ON Answers.id = Responses.answerId) AS tbAnswers\n" +
-                "ON tbAnswers.questionId = Questions.id\n" +
-                "WHERE Questions.quizId = ?\n" +
-                "ORDER BY questionId, answerId";
+            "  Questions.id AS questionId,\n" +
+            "  Questions.name AS questionName,\n" +
+            "  Questions.text AS questionText,\n" +
+            "  Questions.multipleChoice AS multipleChoice,\n" +
+            "  tbAnswers.id AS answerId,\n" +
+            "  tbAnswers.text AS answerText,\n" +
+            "  tbAnswers.correctness AS correctAnswer,\n" +
+            "  tbAnswers.isSelected AS selectedAnswer\n" +
+            "FROM  Questions\n" +
+            "INNER JOIN\n" +
+            "(SELECT\n" +
+            "  Answers.questionId,\n" +
+            "  Answers.id,\n" +
+            "  Answers.text,\n" +
+            "  Answers.correctness,\n" +
+            "  Responses.isSelected\n" +
+            "FROM Answers\n" +
+            "  LEFT JOIN\n" +
+            "  (SELECT\n" +
+            "   QuizResponses.isSelected,\n" +
+            "     QuizResponses.answerId\n" +
+            "   FROM QuizResponses\n" +
+            "   WHERE QuizResponses.respondentId = ?) AS Responses\n" +
+            "    ON Answers.id = Responses.answerId) AS tbAnswers\n" +
+            "ON tbAnswers.questionId = Questions.id\n" +
+            "WHERE Questions.quizId = ?\n" +
+            "ORDER BY questionId, answerId";
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
 
@@ -841,17 +841,17 @@ class DataBaseConnector {
 
                 if (currQuestion == null || currQuestion.getId() != rs.getInt("questionId")) {
                     currQuestion = new Question(
-                            rs.getInt("questionId"),
-                            rs.getString("questionName"),
-                            rs.getString("questionText"),
-                            rs.getBoolean("multipleChoice"),
-                            quiz);
+                        rs.getInt("questionId"),
+                        rs.getString("questionName"),
+                        rs.getString("questionText"),
+                        rs.getBoolean("multipleChoice"),
+                        quiz);
                 }
                 Answer currAnswer = new Answer(
-                        rs.getInt("answerId"),
-                        rs.getString("answerText"),
-                        rs.getBoolean("correctAnswer"),
-                        currQuestion);
+                    rs.getInt("answerId"),
+                    rs.getString("answerText"),
+                    rs.getBoolean("correctAnswer"),
+                    currQuestion);
                 Vector<Object> row = new Vector<>();
                 row.add(currQuestion);
                 row.add(currAnswer);
@@ -903,7 +903,7 @@ class DataBaseConnector {
     static void makeResponseViewed(User respondent, Quiz quiz) {
 
         String query = "UPDATE AssignedQuizzes SET resultViewed =? " +
-                "WHERE userId=? AND quizId=?";
+            "WHERE userId=? AND quizId=?";
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setBoolean(1, true);
             pstm.setString(2, respondent.getId());

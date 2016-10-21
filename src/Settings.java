@@ -13,9 +13,9 @@ class Settings implements Serializable {
     private volatile static Settings settings;
 
     private String
-            server,
-            database,
-            login;
+        server,
+        database,
+        login;
     private char[] password;
     private InterfaceLanguages localization;
 

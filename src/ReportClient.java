@@ -35,7 +35,7 @@ class ReportClient extends JDialog {
         private ReportGUI() {
 
             buttonSaveToTheFile = new JButton(rb.getString("btSaveToTheFile"),
-                    LoginClient.createImageIcon("images/Save16.gif"));
+                LoginClient.createImageIcon("images/Save16.gif"));
 
             editorPane = new JEditorPane();
             editorPane.setEditable(false);
@@ -74,20 +74,23 @@ class ReportClient extends JDialog {
         Vector rows = DataBaseConnector.getQuizResults(respondent, quiz);
 
         String html = "<html>" +
-                "<header>" +
-                "<style>" +
-                "body {color:#000; font-family: Verdana, times; margin: 4px; font-size:100%;}" +
-                "h1 {color: blue;}" +
-                "h3 {margin-bottom: 0px;}" +
-                "#wrapper{width: 500px; margin: 0px auto;}" +
-                ".mkGreen{color:green; font-weight:bold;}" +
-                ".mkRed{color:red; font-weight:bold;}" +
-                "</style>" +
-                "</header>" +
-                "<body>" +
-                "<div id=\"wrapper\">" +
-                "<h1>Quiz submissions: " + quiz.getName() + "</h1>" +
-                "<h2>Respondent: " + respondent + "</h2>";
+            "<header>" +
+            "<style>" +
+            "body {color:#000; " +
+            "font-family: Verdana, times; " +
+            "margin: 4px; " +
+            "font-size:100%;}" +
+            "h1 {color: blue;}" +
+            "h3 {margin-bottom: 0px;}" +
+            "#wrapper{width: 500px; margin: 0px auto;}" +
+            ".mkGreen{color:green; font-weight:bold;}" +
+            ".mkRed{color:red; font-weight:bold;}" +
+            "</style>" +
+            "</header>" +
+            "<body>" +
+            "<div id=\"wrapper\">" +
+            "<h1>Quiz submissions: " + quiz.getName() + "</h1>" +
+            "<h2>Respondent: " + respondent + "</h2>";
 
         int totalQuestions = 0;
         int correctQuestions = 0;
@@ -101,7 +104,8 @@ class ReportClient extends JDialog {
             if (!row.get(0).equals(currQuestion)) {
                 currQuestion = (Question) row.get(0);
                 html += "<h3>" + currQuestion + "</h3>" +
-                        "<p>" + currQuestion.getText().replaceAll("\\n", "<br>") + "</p><br>";
+                    "<p>" + currQuestion.getText().replaceAll("\\n", "<br>") + "</p>" +
+                    "<br>";
                 totalQuestions++;
                 if (answersAreCorrect) {
                     correctQuestions++;
@@ -141,12 +145,14 @@ class ReportClient extends JDialog {
 
         double percent = 0.0;
         if (totalQuestions != 0) {
-            percent = Math.round((double) correctQuestions / (double) totalQuestions * 100.0);
+            percent = Math.round((double) correctQuestions /
+                (double) totalQuestions * 100.0);
         }
-        html += "<br><h3>Total: " + correctQuestions + " / " + totalQuestions + " - " + percent + "%</h3>" +
-                "</div>" +
-                "</body>" +
-                "</html>";
+        html += "<br><h3>Total: " +
+            correctQuestions + " / " + totalQuestions + " - " + percent + "%</h3>" +
+            "</div>" +
+            "</body>" +
+            "</html>";
         return html;
     }
 
@@ -155,20 +161,20 @@ class ReportClient extends JDialog {
         Vector rows = DataBaseConnector.getQuizResults(respondent, quiz);
 
         String html = "<html>" +
-                "<header>" +
-                "<style>" +
-                "body {color:#000; font-family: Verdana, times; margin: 4px; }" +
-                "h1 {color: blue;}" +
-                "h3 {margin-bottom: 0px;}" +
-                "#wrapper{width: 400px; margin: 0px auto;}" +
-                ".mkGreen{color:green; font-weight:bold;}" +
-                ".mkRed{color:red; font-weight:bold;}" +
-                "</style>" +
-                "</header>" +
-                "<body>" +
-                "<div id=\"wrapper\">" +
-                "<h1>Quiz submissions: " + quiz.getName() + "</h1>" +
-                "<h2>Respondent: " + respondent + "</h2>";
+            "<header>" +
+            "<style>" +
+            "body {color:#000; font-family: Verdana, times; margin: 4px; }" +
+            "h1 {color: blue;}" +
+            "h3 {margin-bottom: 0px;}" +
+            "#wrapper{width: 400px; margin: 0px auto;}" +
+            ".mkGreen{color:green; font-weight:bold;}" +
+            ".mkRed{color:red; font-weight:bold;}" +
+            "</style>" +
+            "</header>" +
+            "<body>" +
+            "<div id=\"wrapper\">" +
+            "<h1>Quiz submissions: " + quiz.getName() + "</h1>" +
+            "<h2>Respondent: " + respondent + "</h2>";
 
         Question currQuestion = null;
 
@@ -179,7 +185,7 @@ class ReportClient extends JDialog {
             if (!row.get(0).equals(currQuestion)) {
                 currQuestion = (Question) row.get(0);
                 html += "<h3>" + currQuestion + "</h3>" +
-                        "<p>" + currQuestion.getText().replaceAll("\\n", "<br>") + "</p><br>";
+                    "<p>" + currQuestion.getText().replaceAll("\\n", "<br>") + "</p><br>";
             }
 
             Answer currAnswer = (Answer) row.get(1);
@@ -191,8 +197,8 @@ class ReportClient extends JDialog {
         }
 
         html += "</div>" +
-                "</body>" +
-                "</html>";
+            "</body>" +
+            "</html>";
 
         return html;
     }
@@ -249,7 +255,8 @@ class ReportClient extends JDialog {
                 try {
                     BufferedWriter out = new BufferedWriter(new FileWriter(file));
 
-                    HTMLWriter hw = new HTMLWriter(out, (HTMLDocument) reportGUI.editorPane.getDocument());
+                    HTMLWriter hw =
+                        new HTMLWriter(out, (HTMLDocument) reportGUI.editorPane.getDocument());
                     hw.write();
 
                     out.flush();

@@ -25,7 +25,7 @@ class QuizTakingClient extends JDialog {
         JTextArea questionText;
         JList<Question> questionList;
         JButton buttonPreviousQuestion, buttonNextQuestion,
-                buttonSaveAnswer, buttonFinishQuiz;
+            buttonSaveAnswer, buttonFinishQuiz;
         JScrollPane scrollPaneAnswers;
         JPanel answerPanel;
         Vector<Vector> answerList = new Vector<>();
@@ -72,7 +72,7 @@ class QuizTakingClient extends JDialog {
 
             JScrollPane scrollPaneAllQuestions = new JScrollPane(questionList);
             scrollPaneAllQuestions.setBorder(
-                    BorderFactory.createTitledBorder(rb.getString("tlAllQuestions")));
+                BorderFactory.createTitledBorder(rb.getString("tlAllQuestions")));
             scrollPaneAllQuestions.setPreferredSize(new Dimension(200, 400));
 
             JPanel rightPanel = new JPanel();
@@ -153,7 +153,8 @@ class QuizTakingClient extends JDialog {
     }
 
     /**
-     * The inner QuizTakingHandler class handles all events of the QuizTakingClient class.
+     * The inner QuizTakingHandler class handles all events of the
+     * QuizTakingClient class.
      */
     private class QuizTakingHandler implements ActionListener, ListSelectionListener {
 
@@ -163,12 +164,15 @@ class QuizTakingClient extends JDialog {
 
                 ListModel lm = quizTakingGUI.questionList.getModel();
                 int currInd = quizTakingGUI.questionList.getSelectedIndex();
+
                 if (lm.getSize() > 0 && currInd < lm.getSize()) {
                     quizTakingGUI.questionList.setSelectedIndex(++currInd);
                 }
             } else if (e.getSource().equals(quizTakingGUI.buttonPreviousQuestion)) {
+
                 ListModel lm = quizTakingGUI.questionList.getModel();
                 int currInd = quizTakingGUI.questionList.getSelectedIndex();
+
                 if (lm.getSize() > 0 && currInd > 0) {
                     quizTakingGUI.questionList.setSelectedIndex(--currInd);
                 }
@@ -179,8 +183,10 @@ class QuizTakingClient extends JDialog {
                 is JCheckBox or JRadioButton */
                 Component componentArr[] = quizTakingGUI.answerPanel.getComponents();
                 for (int i = 0; i < componentArr.length; i += 3) {
+
                     Component component = componentArr[i];
                     boolean isSelected = false;
+
                     if (component instanceof JRadioButton) {
                         JRadioButton currButton = (JRadioButton) component;
                         isSelected = currButton.isSelected();
@@ -208,17 +214,23 @@ class QuizTakingClient extends JDialog {
             if (e.getSource().equals(quizTakingGUI.questionList)) {
 
                 Question currQuestion = quizTakingGUI.questionList.getSelectedValue();
-                quizTakingGUI.questionText.setText(currQuestion.getText()); //Set the text of the question
-                quizTakingGUI.questionText.setCaretPosition(0); //move to the top
+                //Set the text of the question
+                quizTakingGUI.questionText.setText(currQuestion.getText());
+                //move to the top
+                quizTakingGUI.questionText.setCaretPosition(0);
 
                 //set the answer panel
                 quizTakingGUI.answerPanel = quizTakingGUI.buildAnswerPanel(currQuestion);
                 quizTakingGUI.scrollPaneAnswers.setViewportView(quizTakingGUI.answerPanel);
 
-                //move scroll bars to the top and left.
-                SwingUtilities.invokeLater(() -> {
-                    quizTakingGUI.scrollPaneAnswers.getVerticalScrollBar().setValue(0);
-                    quizTakingGUI.scrollPaneAnswers.getHorizontalScrollBar().setValue(0);
+                //move scroll bars to the top and to the left using another thread;
+                // otherwise, the answers' panel will be at the bottom.
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        quizTakingGUI.scrollPaneAnswers.getVerticalScrollBar().setValue(0);
+                        quizTakingGUI.scrollPaneAnswers.getHorizontalScrollBar().setValue(0);
+                    }
                 });
             }
         }
@@ -228,6 +240,7 @@ class QuizTakingClient extends JDialog {
      * The QuizTakingClient constructor.
      */
     QuizTakingClient(ApplicationClient frame, Quiz quiz, User respondent) {
+
         super(frame, true);
         this.quiz = quiz;
         this.respondent = respondent;

@@ -3,7 +3,7 @@
  *
  * @author Aleksei_Semenov 17/08/16.
  */
-class User extends Reference<String>{
+class User extends Reference<String> {
 
     private String firstName;
     private String lastName;
